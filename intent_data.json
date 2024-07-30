@@ -1,0 +1,8 @@
+{
+  "categories": ["weather", "visitor", "gender"],
+  "texts": [
+    ("What's the weather like today?", {"cats": {"weather": 1, "visitor": 0, "gender": 0}}),
+    ("Tell me the visitor count for today.", {"cats": {"weather": 0, "visitor": 1, "gender": 0}}),
+    ("How many males visited last month?", {"cats": {"weather": 0, "visitor": 0, "gender": 1}})
+  ]
+}
