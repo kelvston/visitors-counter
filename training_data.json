@@ -1,0 +1,9 @@
+[
+    {
+        "text": "what is male visitors today",
+        "entities": [
+            [8, 12, "GENDER"],
+            [21, 26, "DATE"]
+        ]
+    }
+]

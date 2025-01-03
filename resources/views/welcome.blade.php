@@ -163,6 +163,10 @@
                     </button>
                 </div>
             </form>
+            <div class="form-group">
+                <p>Don't have an account? <a href="{{ route('register') }}" style="color: #007bff;">Register here</a></p>
+            </div>
+
 
             <div class="footer">
                 <p>&copy; <span id="currentYear"></span> ARU Library. All rights reserved.</p>

@@ -1,4 +1,6 @@
 @extends('layouts.header')
+
+@section('content')
 <style>
     /* Consolidated and updated CSS */
    /* Consolidated and updated CSS */
@@ -159,37 +161,32 @@ body {
     background-color: #f1f1f1;
     color: #333;
 }
+    /* Custom styles for smaller decrement buttons */
+    .decrement-btn {
+        width: 20px;          /* Reduced width */
+        height: 20px;         /* Reduced height */
+        padding: 0;           /* No padding */
+        font-size: 14px;      /* Smaller font size */
+        line-height: 1;       /* Maintain single line height */
+        display: inline-flex;  /* Center the content */
+        align-items: center;   /* Center vertically */
+        justify-content: center; /* Center horizontally */
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2); /* Subtle shadow */
+        transition: background-color 0.3s ease, box-shadow 0.3s ease; /* Smooth transition */
+    }
+
+    .decrement-btn:hover {
+        background-color: #f8d7da; /* Light background on hover */
+        box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2); /* Shadow on hover */
+    }
+
+    .decrement-btn:active {
+        box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.2); /* Inset shadow when active */
+    }
+
 
 </style>
 @section('content')
-{{-- <div class="col-12 px-0 pb-1">
-
-    <div class="container mt-0 top-middle">
-        <div class="row align-items-center">
-            <!-- Emblem Section -->
-            <div class="col-md-2 col-sm-2 col-xs-2 text-center">
-                <a href="https://www.aru.ac.tz">
-                    <img src="https://www.aru.ac.tz/site/images/emblem.png" alt="emblem" class="emblem img-fluid">
-                </a>
-            </div>
-
-            <!-- University Title Section -->
-            <div class="col-md-8 col-sm-8 col-xs-8 text-center">
-                <h1 class="mb-0 title">ARDHI UNIVERSITY</h1>
-            </div>
-
-            <!-- Client Logo Section -->
-            <div class="col-md-2 col-sm-2 col-xs-2 text-center">
-                <a href="https://www.aru.ac.tz">
-                    <img src="https://www.aru.ac.tz/site/images/logo.jpg" alt="Logo" class="client-logo img-fluid">
-                </a>
-            </div>
-        </div>
-    </div>
- --}}
-
-{{-- <div class="container mt-5 bordered-container"> --}}
-
     <!-- Breadcrumb -->
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
@@ -216,12 +213,24 @@ body {
                         </tr>
                         </thead>
                         <tbody>
-                        @foreach (['today'=>'Today','yesterday' => 'Yesterday', 'weekly' => 'Last Week', 'monthly' => 'This Month', 'lastMonth' => 'Last Month', 'threeMonths' => 'Last Three Months', 'total' => 'TOTAL VISITS'] as $period => $label)
+                        @foreach (['today'=>'Today','yesterday' => 'Yesterday', 'weekly' => 'This Week', 'monthly' => 'This Month', 'lastMonth' => 'Last Month', 'threeMonths' => 'Last Three Months', 'total' => 'TOTAL VISITS'] as $period => $label)
                             <tr>
                                 <td>{{ $label }}</td>
-                                <td>{{ $summary[$period]['Male'] }}</td>
-                                <td>{{ $summary[$period]['Female'] }}</td>
-                                <td>{{ $summary[$period]['Other'] }}</td>
+                                <td>{{ $summary[$period]['Male'] }}
+                                    @if ($period === 'today')
+                                        <button class="btn btn-sm btn-outline-danger rounded-circle ml-2 decrement-btn" onclick="decrementCount('male')">-</button>
+                                    @endif
+                                </td>
+                                <td>{{ $summary[$period]['Female'] }}
+                                    @if ($period === 'today')
+                                        <button class="btn btn-sm btn-outline-danger rounded-circle ml-2 decrement-btn" onclick="decrementCount('female')">-</button>
+                                    @endif
+                                </td>
+                                <td>{{ $summary[$period]['Other'] }}
+                                    @if ($period === 'today')
+                                        <button class="btn btn-sm btn-outline-danger rounded-circle ml-2 decrement-btn" onclick="decrementCount('other')">-</button>
+                                    @endif
+                                </td>
                                 <td>{{ $summary[$period]['totalVisits'] }}</td>
                             </tr>
                         @endforeach
@@ -250,13 +259,33 @@ body {
                         </div>
                     </form>
 
+                
                     <div id="thankYouMessage" style="display:none; margin-top:20px;" class="alert alert-success">
                         Thank you!
                     </div>
                 </div>
-            </div>
-        </div>
+                    <div class="card-body text-center" style="display:none;" id = "multiple">
+                        <form id="multiple" action="{{ route('counter.increment.multiple') }}" method="POST" class="mb-3">
+                                @csrf
+                            
+                                <div id="genderCounts" style="margin-top:20px;">
+                                <label for="maleCountInput">Male Count:</label>
+                                <input type="number" id="maleCountInput" name ="maleCountInput" class="form-control" >
 
+                                <label for="femaleCountInput" style="margin-top:10px;">Female Count:</label>
+                                <input type="number" id="femaleCountInput" name ="femaleCountInput" class="form-control" >
+
+                                <label for="otherCountInput" style="margin-top:10px;">Other Count:</label>
+                                <input type="number" id="otherCountInput" name ="otherCountInput" class="form-control" >
+                                </div>
+                                <button type="submit" class="btn btn-success mt-3">Submit</button>
+                            </form>
+
+                            </div>
+                    </div>
+                </div>
+     
+    
         <!-- Visitor Pie Chart -->
         <div class="col-md-4 mb-1">
             <div class="card shadow-sm">
@@ -297,9 +326,11 @@ body {
             </div>
         </div>
     </div>
-</div>
+
+
 
 @endsection
+
 
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -340,7 +371,22 @@ body {
                 event.preventDefault();
                 submitForm();
             }
+
+            if (event.shiftKey && document.getElementById('multiple').style.display === 'none') {
+            event.preventDefault();
+            showMultiple();
+             }
+                });
+
+                document.addEventListener('keydown', function(event) {
+            if (event.shiftKey && document.getElementById('multiple').style.display === 'none') {
+                event.preventDefault();
+                showMultiple();
+                submitForm();
+            }
         });
+
+
 
         document.addEventListener('keydown', function (event) {
             if (document.getElementById('genderSelectContainer').style.display !== 'none') {
@@ -411,6 +457,12 @@ body {
         document.getElementById('gender').focus();
     }
 
+    function showMultiple() {
+        document.getElementById('multiple').style.display = 'block';
+        document.getElementById('gender').focus();
+    }
+
+
     function submitForm() {
         if (isSubmitting) return;
         isSubmitting = true;
@@ -463,5 +515,38 @@ body {
             isSubmitting = false;
         });
     }
+
+    function decrementCount(gender) {
+        $.ajax({
+            url: '{{ route('counter.decrement') }}',
+            type: 'POST',
+            data: {
+                gender: gender,
+                _token: '{{ csrf_token() }}'
+            },
+            success: function(response) {
+                if (response.success) {
+                    Swal.fire({
+                        title: 'Success',
+                        text: response.message,
+                        icon: 'success',
+                        timer: 1500,
+                        showConfirmButton: false
+                    });
+                    // Reload or update the table data here, if necessary.
+                    location.reload();  // Refresh the page to show the updated count
+                }
+            },
+            error: function() {
+                Swal.fire({
+                    title: 'Error',
+                    text: 'Could not decrement the count.',
+                    icon: 'error'
+                });
+            }
+        });
+    }
+
+
 </script>
 @endpush

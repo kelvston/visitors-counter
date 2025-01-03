@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\VisitorsCounterController;
+use App\Http\Controllers\reportController;
 use App\Http\Controllers\ChatbotController;
 use Illuminate\Support\Facades\Route;
 
@@ -20,12 +21,19 @@ Route::middleware('auth')->group(function () {
 });
 Route::get('/report', [VisitorsCounterController::class, 'show'])->name('counter.report');
 Route::post('/report', [VisitorsCounterController::class, 'increment'])->name('counter.increment');
+Route::post('/multiple', [VisitorsCounterController::class, 'incrementMultiple'])->name('counter.increment.multiple');
 Route::get('/chatbot', [VisitorsCounterController::class, 'index']);
 Route::post('/chatbot', [VisitorsCounterController::class, 'respond']);
 Route::get('/visitor-summary', [VisitorsCounterController::class, 'getVisitorSummary'])->name('visitor.summary');
 Route::get('/visitor-data', [VisitorsCounterController::class, 'getVisitorDataForChatbot'])->name('visitor.data');
 Route::post('/analyze-text', [VisitorsCounterController::class, 'analyzeTextWithSpacy']);
 Route::get('/analyze-test', [VisitorsCounterController::class, 'testPythonScript']);
+Route::post('/counter/decrement', [VisitorsCounterController::class, 'decrement'])->name('counter.decrement');
+
+Route::get('/visitor_stats', [reportController::class, 'index'])->name('visitor_stats');
+Route::get('/data', [reportController::class, 'getData'])->name('report.data');
+
+
 
 Route::get('/test-script-path', function () {
     $scriptPath = base_path('analyze_text_spacy.py');
