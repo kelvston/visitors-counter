@@ -117,6 +117,9 @@
                     <a class='nav-link' target='_blank' href='{{ route('visitor_stats') }}'>Report</a>
                 </li>
                 <li class='nav-item'>
+                    <a class='nav-link'  href='{{ route('news_leter') }}'>News Letter</a>
+                </li>
+                <li class='nav-item'>
                     <a class='nav-link' href='{{ route('counter.report') }}'>Home</a>
                 </li>
                 <li class='nav-item relative'>

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\VisitorsCounterController;
+use App\Http\Controllers\NewsLetterController;
 use App\Http\Controllers\reportController;
 use App\Http\Controllers\ChatbotController;
 use Illuminate\Support\Facades\Route;
@@ -31,6 +32,8 @@ Route::get('/analyze-test', [VisitorsCounterController::class, 'testPythonScript
 Route::post('/counter/decrement', [VisitorsCounterController::class, 'decrement'])->name('counter.decrement');
 
 Route::get('/visitor_stats', [reportController::class, 'index'])->name('visitor_stats');
+Route::get('/news_leter', [NewsLetterController::class, 'index'])->name('news_leter');
+Route::post('/news_leter_store', [NewsLetterController::class, 'store'])->name('news_leter.store');
 Route::get('/data', [reportController::class, 'getData'])->name('report.data');
 
 
