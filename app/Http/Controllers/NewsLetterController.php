@@ -33,11 +33,11 @@ class NewsLetterController extends Controller
 
         $summary = [];
 
-    
-        foreach (['1' => 'Daly News', '2' => 'Guardian', '3' => 'Nipashe','4' => 'Uhuru','5' => 'Habari Leo','6' => 'Citizen','7' => 'East African','8' => 'Mwananchi'] as $news => $label) {
+
+        foreach (['Daily News' => 'Daily News', 'Guardian' => 'Guardian', 'Nipashe' => 'Nipashe','Uhuru' => 'Uhuru','Habari Leo' => 'Habari Leo','Citizen' => 'Citizen','East African' => 'East African','Mwananchi' => 'Mwananchi'] as $news => $label) {
             foreach (['yesterday', 'today', 'weekly', 'monthly', 'lastMonth', 'threeMonths', 'total'] as $period) {
                 $user = auth()->user();
-            
+
                 $query = NewsLetter::where('user_id', $user->id)
                     ->where('name', $news);
 
@@ -64,9 +64,8 @@ class NewsLetterController extends Controller
                 }
 
                 $summary[$period][$label] = $query->sum('counts') ?? 0;
-            
+
             }
-        
         }
 
         // Calculate totalVisits for each period
@@ -94,7 +93,8 @@ class NewsLetterController extends Controller
 
     public function store(Request $request){
         $user = Auth::user();
-    $newsletter = $request['newsletterInput'];
+    $newsletter = $request['newsletter'];
+    $input = $request['newsletterInput'];
    $name = null;
     switch($newsletter){
         case 1:
@@ -102,7 +102,7 @@ class NewsLetterController extends Controller
             break;
             case 2:
                 $name = 'Guardian';
-                break; 
+                break;
             case 3:
                 $name = 'Nipashe';
                 break;
@@ -122,7 +122,8 @@ class NewsLetterController extends Controller
                 $name = 'Mwananchi';
                 break;
     }
-    if ($newsletter > 0) {
+
+    if ($input > 0) {
         $news = NewsLetter::firstOrCreate(
             [
                 'user_id' => $user->id,
@@ -131,7 +132,7 @@ class NewsLetterController extends Controller
             ],
             ['counts' => 0]
         );
-        $news->increment('counts', $newsletter); 
+        $news->increment('counts', $input);
     }
 
     if ($request->ajax()) {

@@ -30,6 +30,11 @@
 
       <link rel="stylesheet" href="https://www.aru.ac.tz/site/css/master.min.css">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400&display=swap">
+    <!-- Add this in the <head> section for Bootstrap CSS -->
+{{--    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">--}}
+
+{{--    <!-- Add this before the closing </body> tag for Bootstrap JS -->--}}
+{{--    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>--}}
 
   <style>
     .nav-link {
@@ -100,6 +105,23 @@
     .project-div:hover {
       background-color: #f5f5f5;
     }
+    #newsletterTable {
+        width: 100%;
+        table-layout: fixed; /* Ensures columns have a fixed width and don't resize */
+        border-collapse: collapse; /* Prevents borders from affecting the layout */
+    }
+
+    #newsletterTable th, #newsletterTable td {
+        text-align: center;
+        padding: 8px;
+        overflow: hidden;
+        text-overflow: ellipsis; /* In case the content overflows, it will show '...' */
+    }
+
+    #newsletterTable th {
+        background-color: #f2f2f2; /* Optional: Makes header stand out */
+    }
+
   </style>
 </head>
 
@@ -113,24 +135,32 @@
         <div class="row top_nav">
           <div class="top_menu d-flex">
             <ul class="list-inline mx-auto justify-content-center">
-                <li class='nav-item'>
-                    <a class='nav-link' target='_blank' href='{{ route('visitor_stats') }}'>Report</a>
-                </li>
-                <li class='nav-item'>
-                    <a class='nav-link'  href='{{ route('news_leter') }}'>News Letter</a>
-                </li>
-                <li class='nav-item'>
-                    <a class='nav-link' href='{{ route('counter.report') }}'>Home</a>
-                </li>
-                <li class='nav-item relative'>
-                    <a class='nav-link'>{{ Auth::user()->name }}</a>
-                </li>
-                <li class='nav-item'>
-                    <form method="POST" action="{{ route('logout') }}" class="d-inline">
-                        @csrf
-                        <button type="submit" class="btn btn-link nav-link">{{ __('Log Out') }}</button>
-                    </form>
-                </li>
+                @if(Auth::check())
+                    <li class='nav-item'>
+                        <a class='nav-link' target='_blank' href='{{ route('visitor_stats') }}'>Report</a>
+                    </li>
+                    <li class='nav-item'>
+                        <a class='nav-link' href='{{ route('news_leter') }}'>Newsletters</a>
+                    </li>
+                    <li class='nav-item'>
+                        <a class='nav-link' href='{{ route('counter.report') }}'>Visitors</a>
+                    </li>
+                    <li class='nav-item relative'>
+                        <a class='nav-link'>{{ Auth::user()->name }}</a>
+                    </li>
+                    <li class='nav-item'>
+                        <form method="POST" action="{{ route('logout') }}" class="d-inline">
+                            @csrf
+                            <button type="submit" class="btn btn-link nav-link">{{ __('Log Out') }}</button>
+                        </form>
+                    </li>
+                @else
+                    <script>
+                        // Redirect to the login page
+                        window.location.href = '{{ route('login') }}';
+                    </script>
+                @endif
+
             </ul>
 
           </div>

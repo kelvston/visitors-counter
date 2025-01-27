@@ -30,7 +30,28 @@ class reportController extends Controller
             ->orderByDesc(DB::raw('DATE(counters.created_at)'))
             ->get();
 
-        return view('report.index')->with('data', $data);
+        $news = DB::table('news_letters')
+            ->select(
+                DB::raw('DATE(news_letters.created_at) as date'),
+                'users.name as user_name',
+                DB::raw("SUM(CASE WHEN news_letters.name = 'Guardian' THEN news_letters.counts ELSE 0 END) as guardian_count"),
+                DB::raw("SUM(CASE WHEN news_letters.name = 'Nipashe' THEN news_letters.counts ELSE 0 END) as nipashe_count"),
+                DB::raw("SUM(CASE WHEN news_letters.name = 'Habari Leo' THEN news_letters.counts ELSE 0 END) as habari_leo_count"),
+                DB::raw("SUM(CASE WHEN news_letters.name = 'Uhuru' THEN news_letters.counts ELSE 0 END) as uhuru_count"),
+                DB::raw("SUM(CASE WHEN news_letters.name = 'East African' THEN news_letters.counts ELSE 0 END) as east_african_count"),
+                DB::raw("SUM(CASE WHEN news_letters.name = 'Mwananchi' THEN news_letters.counts ELSE 0 END) as mwananchi_count"),
+                DB::raw("SUM(CASE WHEN news_letters.name = 'Citizen' THEN news_letters.counts ELSE 0 END) as citizen_count"),
+                DB::raw("SUM(CASE WHEN news_letters.name = 'Daily News' THEN news_letters.counts ELSE 0 END) as daily_news_count"),
+                DB::raw("SUM(CASE WHEN news_letters.name IN ('Guardian', 'Nipashe', 'Habari Leo', 'Uhuru', 'East African', 'Mwananchi', 'Citizen', 'Daily News') THEN news_letters.counts ELSE 0 END) as total_count")
+            )
+            ->join('users', 'news_letters.user_id', '=', 'users.id')
+            ->groupBy(DB::raw('DATE(news_letters.created_at)'), 'users.name')
+            ->orderByDesc(DB::raw('DATE(news_letters.created_at)'))
+            ->get();
+
+
+
+        return view('report.index')->with('data', $data)->with('news',$news);
     }
 
     /**

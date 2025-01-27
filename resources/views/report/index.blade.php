@@ -1,38 +1,47 @@
 @extends('layouts.header')
 
 @section('content')
-    <div class="accordion" id="filterAccordion">
-        <div class="card">
-            <div class="card-header" id="filterHeading">
-                <h5 class="mb-0">
-                    <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#filterCollapse" aria-expanded="true" aria-controls="filterCollapse">
-                        Filters
-                    </button>
-                </h5>
-            </div>
-
-            <div id="filterCollapse" class="collapse show" aria-labelledby="filterHeading" data-parent="#filterAccordion">
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="dateRange">Filter by Date:</label>
-                                <input type="text" id="dateRange" class="form-control" placeholder="Select date range">
+    <ul class="nav nav-tabs">
+        <li class="nav-item">
+            <a class="nav-link active" data-toggle="tab" href="#visitors">Visitors Report</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" data-toggle="tab" href="#newsletters">Newsletter Report</a>
+        </li>
+    </ul>
+    <div class="tab-content mt-4">
+        <!-- Visitors Report -->
+        <div id="visitors" class="tab-pane fade show active">
+            <div class="accordion" id="filterAccordionVisitors">
+                <div class="card">
+                    <div class="card-header" id="filterHeadingVisitors">
+                        <h5 class="mb-0">
+                            <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#filterCollapseVisitors" aria-expanded="true" aria-controls="filterCollapseVisitors">
+                                Filters
+                            </button>
+                        </h5>
+                    </div>
+                    <div id="filterCollapseVisitors" class="collapse show" aria-labelledby="filterHeadingVisitors" data-parent="#filterAccordionVisitors">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="dateRange">Filter by Date:</label>
+                                        <input type="text" id="dateRange" class="form-control" placeholder="Select date range">
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
 
     <button id="exportBtn" class="btn btn-primary">Export to Excel</button>
 
-    <h2>General Report</h2>
 
-    <div class="row">
-        <div class="col-md-12">
-            <table id="visitorTable" class="table table-striped table-bordered">
+            <h3>Visitors Report</h3>
+            <table class="table table-bordered table-striped table-bordered" id="visitorTable">
+{{--            <table id="visitorTable" class="table table-striped table-bordered">--}}
                 <thead>
                 <tr>
                     <th>Date</th>
@@ -56,20 +65,96 @@
                 @endforeach
                 </tbody>
             </table>
+            <div class="row">
+                <div class="col-md-8">
+                    <canvas id="genderTrendChart" style="height:400px;"></canvas>
+                </div>
+                <div class="col-md-4">
+                    <canvas id="genderPieChart" style="width:100%; height:100%;"></canvas>
+                </div>
+            </div>
         </div>
-    </div>
+        <!-- Newsletter Report -->
+        <div id="newsletters" class="tab-pane fade">
+            <div class="accordion" id="filterAccordionNewsletters">
+                <div class="card">
+                    <div class="card-header" id="filterHeadingNewsletters">
+                        <h5 class="mb-0">
+                            <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#filterCollapseNewsletters" aria-expanded="true" aria-controls="filterCollapseNewsletters">
+                                Filters
+                            </button>
+                        </h5>
+                    </div>
+                    <div id="filterCollapseNewsletters" class="collapse show" aria-labelledby="filterHeadingNewsletters" data-parent="#filterAccordionNewsletters">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="dateRangeNew">Filter by Date:</label>
+                                        <input type="text" id="dateRangeNew" class="form-control" placeholder="Select date range">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Export Button -->
+            <button id="exportBtnNews" class="btn btn-primary">Export to Excel</button>
 
-    <div class="row">
-        <div class="col-md-8">
-            <canvas id="genderTrendChart" style="height:400px;"></canvas>
+            <!-- Table for Newsletter Data -->
+            <table class="table table-bordered table-striped table-bordered" id="newsletterTable">
+                <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Officer</th>
+                    <th>Guardian</th>
+                    <th>Nipashe</th>
+                    <th>H/Leo</th>
+                    <th>Uhuru</th>
+                    <th>E/African</th>
+                    <th>Mwananchi</th>
+                    <th>Citizen</th>
+                    <th>Daily News</th>
+                    <th>Total Count</th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach($news as $newsletter)
+                    <tr>
+                        <td>{{ $newsletter->date }}</td>
+                        <td>{{ $newsletter->user_name }}</td>
+                        <td>{{ $newsletter->guardian_count ?: 0 }}</td>
+                        <td>{{ $newsletter->nipashe_count ?: 0 }}</td>
+                        <td>{{ $newsletter->habari_leo_count ?: 0 }}</td>
+                        <td>{{ $newsletter->uhuru_count ?: 0 }}</td>
+                        <td>{{ $newsletter->east_african_count ?: 0 }}</td>
+                        <td>{{ $newsletter->mwananchi_count ?: 0 }}</td>
+                        <td>{{ $newsletter->citizen_count ?: 0 }}</td>
+                        <td>{{ $newsletter->daily_news_count ?: 0 }}</td>
+                        <td>{{ $newsletter->total_count }}</td>
+                    </tr>
+                @endforeach
+                </tbody>
+            </table>
+
+
         </div>
-       <div class="col-md-4">
-            <canvas id="genderPieChart" style="width:100%; height:100%;"></canvas>
         </div>
-    </div>
-@endsection
+
+
+
+
+        @endsection
 @push('scripts')
     <!-- Include jQuery, DataTables JS/CSS, Moment.js, Date Range Picker, and Chart.js -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/laravel-excel@3.1.0/dist/js/laravel-excel.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/moment.js"></script>
+
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
     <link href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css" rel="stylesheet">
@@ -93,7 +178,24 @@
                 deferRender: true
             });
 
+            var newslettertable = $('#newsletterTable').DataTable({
+                responsive: true,
+                paging: true,
+            });
+
             $('#dateRange').daterangepicker({
+                autoUpdateInput: false,
+                locale: { cancelLabel: 'Clear' },
+                ranges: {
+                    'Today': [moment(), moment()],
+                    'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+                    'This Month': [moment().startOf('month'), moment().endOf('month')],
+                    'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+                }
+            });
+
+            // Newsletter Date Range Picker
+            $('#dateRangeNew').daterangepicker({
                 autoUpdateInput: false,
                 locale: { cancelLabel: 'Clear' },
                 ranges: {
@@ -117,40 +219,215 @@
                 table.draw();
                 updateCharts();
             });
+            $('#dateRangeNew').on('apply.daterangepicker', function(ev, picker) {
+                var startDate = picker.startDate.format('YYYY-MM-DD');
+                var endDate = picker.endDate.format('YYYY-MM-DD');
+
+                $.fn.dataTable.ext.search.push(function(settings, data, dataIndex) {
+                    var rowDate = moment(data[0], 'YYYY-MM-DD').format('YYYY-MM-DD');
+                    return rowDate >= startDate && rowDate <= endDate;
+                });
+
+                newslettertable.draw();
+            });
 
             $('#dateRange').on('cancel.daterangepicker', function(ev, picker) {
                 $.fn.dataTable.ext.search.pop();
                 table.draw();
                 updateCharts();
             });
-
-            // Export Button
+            $('#dateRangeNew').on('cancel.daterangepicker', function(ev, picker) {
+                $.fn.dataTable.ext.search.pop();
+                newslettertable.draw();
+            });
             $('#exportBtn').on('click', function() {
-                var data = table.rows({ filter: 'applied' }).data();
-                var exportData = [];
-                data.each(function(row) {
-                    exportData.push({
-                        Date: row[0],
-                        'Officer': row[1],
-                        Male: row[2],
-                        Female: row[3],
-                        Other: row[4],
-                        'Total Count': row[5]
+
+                var activeTab = $('.nav-tabs .active').attr('href');
+
+                if (activeTab === '#visitors') {
+                    var data = table.rows({ filter: 'applied' }).data();
+                    var exportData = [];
+                    data.each(function(row) {
+                        exportData.push({
+                            Date: row[0],
+                            'Officer': row[1],
+                            Male: row[2],
+                            Female: row[3],
+                            Other: row[4],
+                            'Total Count': row[5]
+                        });
                     });
-                });
-                var csvContent = "Date, Officer, Male, Female, Other, Total Count\n";
+                    var csvContent = "Date, Officer, Male, Female, Other, Total Count\n";
+                } else if (activeTab === '#newsletters') {
+                    var data = newslettertable.rows({ filter: 'applied' }).data();
+                    var exportData = [];
+                    data.each(function(row) {
+                        exportData.push({
+                            Date: row[0],
+                            'User Name': row[1],
+                            Guardian: row[2],
+                            Nipashe: row[3],
+                            'Habari Leo': row[4],
+                            Uhuru: row[5],
+                            'East African': row[6],
+                            Mwananchi: row[7],
+                            Citizen: row[8],
+                            'Daily News': row[9],
+                            'Total Count': row[10]
+                        });
+                    });
+                    var csvContent = "Date, User Name, Guardian, Nipashe, Habari Leo, Uhuru, East African, Mwananchi, Citizen, Daily News, Total Count\n";
+                }
+
                 exportData.forEach(function(rowArray) {
                     var row = Object.values(rowArray).join(",");
                     csvContent += row + "\n";
                 });
+
                 var hiddenElement = document.createElement('a');
                 hiddenElement.href = 'data:text/csv;charset=utf-8,' + encodeURI(csvContent);
                 hiddenElement.target = '_blank';
-                hiddenElement.download = 'gender_report.csv';
+                hiddenElement.download = (activeTab === '#visitors' ? 'visitor_report.csv' : 'newsletter_report.csv');
                 hiddenElement.click();
             });
 
-            // Donut Chart (Gender Distribution)
+            $('#exportBtnNews').on('click', function() {
+                var activeTab = $('.nav-tabs .active').attr('href');
+
+                if (activeTab === '#newsletters') {
+                    var data = newslettertable.rows({filter: 'applied'}).data();  // Corrected variable name here
+                    var exportData = [];
+                    var grandTotalBefore = 0; // Initialize grand total before 15% discount
+                    var grandTotalAfter = 0;  // Initialize grand total after 15% discount
+                    var totalGuardianCount = 0;
+                    var totalNipasheCount = 0;
+                    var totalHabariLeoCount = 0;
+                    var totalUhuruCount = 0;
+                    var totalEastAfricanCount = 0;
+                    var totalMwananchiCount = 0;
+                    var totalCitizenCount = 0;
+                    var totalDailyNewsCount = 0;
+
+                    // Prices for each newsletter type
+                    const prices = {
+                        Guardian: 2000,
+                        Nipashe: 2000,
+                        'Habari Leo': 3000,
+                        Uhuru: 2000,
+                        'East African': 3000,
+                        Mwananchi: 1500,
+                        Citizen: 2000,
+                        'Daily News': 3000
+                    };
+
+                    data.each(function (row) {
+                        // Prices for each newsletter type
+                        const totalGuardian = row[2] * prices.Guardian;
+                        const totalNipashe = row[3] * prices.Nipashe;
+                        const totalHabariLeo = row[4] * prices['Habari Leo'];
+                        const totalUhuru = row[5] * prices.Uhuru;
+                        const totalEastAfrican = row[6] * prices['East African'];
+                        const totalMwananchi = row[7] * prices.Mwananchi;
+                        const totalCitizen = row[8] * prices.Citizen;
+                        const totalDailyNews = row[9] * prices['Daily News'];
+
+                        // Calculate the total price before the 15% discount
+                        const totalBefore = totalGuardian + totalNipashe + totalHabariLeo + totalUhuru + totalEastAfrican + totalMwananchi + totalCitizen + totalDailyNews;
+
+                        // Add to grand total before
+                        grandTotalBefore += totalBefore;
+
+                        // Calculate the total after 15% discount
+                        const totalAfter15 = totalBefore * 0.85; // 15% discount
+
+                        // Add to grand total after
+                        grandTotalAfter += totalAfter15;
+
+                        // Calculate Total Count for this row
+                        const totalCount = sum(row[2] + row[3] + row[4] + row[5] + row[6] + row[7] + row[8] + row[9]);
+
+                        // Add the counts for each newsletter type
+                        totalGuardianCount += row[2];  // Add Guardian count
+                        totalNipasheCount += row[3];   // Add Nipashe count
+                        totalHabariLeoCount += row[4]; // Add Habari Leo count
+                        totalUhuruCount += row[5];     // Add Uhuru count
+                        totalEastAfricanCount += row[6]; // Add East African count
+                        totalMwananchiCount += row[7];  // Add Mwananchi count
+                        totalCitizenCount += row[8];    // Add Citizen count
+                        totalDailyNewsCount += row[9];  // Add Daily News count
+
+                        // Push the data into exportData without the individual total columns
+                        exportData.push({
+                            Date: row[0],
+                            'User Name': row[1],
+                            Guardian: row[2],
+                            'Guardian Price': totalGuardian,  // Added total price for Guardian
+                            Nipashe: row[3],
+                            'Nipashe Price': totalNipashe,    // Added total price for Nipashe
+                            'Habari Leo': row[4],
+                            'Habari Price': totalHabariLeo,   // Added total price for Habari Leo
+                            Uhuru: row[5],
+                            'Uhuru Price': totalUhuru,        // Added total price for Uhuru
+                            'East African': row[6],
+                            'East Price': totalEastAfrican,   // Added total price for East African
+                            Mwananchi: row[7],
+                            'Mwananchi Price': totalMwananchi, // Added total price for Mwananchi
+                            Citizen: row[8],
+                            'Citizen Price': totalCitizen,    // Added total price for Citizen
+                            'Daily News': row[9],
+                            'Daily Price': totalDailyNews,    // Added total price for Daily News
+                            'Total Count': totalCount // Correct Total Count
+                        });
+                    });
+
+// After processing all rows, add the grand totals and total counts as a final row
+                    exportData.push({
+                        Date: 'TOTAL',
+                        'User Name': '',
+                        Guardian: totalGuardianCount,
+                        'Guardian Price': totalGuardianCount * prices.Guardian,
+                        Nipashe: totalNipasheCount,
+                        'Nipashe Price': totalNipasheCount * prices.Nipashe,
+                        'Habari Leo': totalHabariLeoCount,
+                        'Habari Price': totalHabariLeoCount * prices['Habari Leo'],
+                        Uhuru: totalUhuruCount,
+                        'Uhuru Price': totalUhuruCount * prices.Uhuru,
+                        'East African': totalEastAfricanCount,
+                        'East Price': totalEastAfricanCount * prices['East African'],
+                        Mwananchi: totalMwananchiCount,
+                        'Mwananchi Price': totalMwananchiCount * prices.Mwananchi,
+                        Citizen: totalCitizenCount,
+                        'Citizen Price': totalCitizenCount * prices.Citizen,
+                        'Daily News': totalDailyNewsCount,
+                        'Daily Price': totalDailyNewsCount * prices['Daily News'],
+                        'Total Count': totalGuardianCount + totalNipasheCount + totalHabariLeoCount + totalUhuruCount + totalEastAfricanCount + totalMwananchiCount + totalCitizenCount + totalDailyNewsCount, // Correct Total Count sum
+                        'Total Before 15%': grandTotalBefore,
+                        'Total After 15%': grandTotalAfter,
+                    });
+
+// Now, generate the CSV content with the headers
+                    var csvContent = "Date, User Name, Guardian, Guardian Price, Nipashe, Nipashe Price, Habari Leo, Habari Price, Uhuru, Uhuru Price, East African, East Price, Mwananchi, Mwananchi Price, Citizen, Citizen Price, Daily News, Daily Price, Total Count, Total Before 15%, Total After 15%\n";
+
+// Now, append the rows to csvContent
+                    exportData.forEach(function (rowData) {
+                        var row = [];
+                        for (var key in rowData) {
+                            row.push(rowData[key]);
+                        }
+                        csvContent += row.join(",") + "\n";
+                    });
+                }
+// Trigger the download
+                    var hiddenElement = document.createElement('a');
+                    hiddenElement.href = 'data:text/csv;charset=utf-8,' + encodeURI(csvContent);
+                    hiddenElement.target = '_blank';
+                    hiddenElement.download = 'newsletter_report.csv';
+                    hiddenElement.click();
+
+                });
+
+
+                // Donut Chart (Gender Distribution)
             var ctxPie = document.getElementById('genderPieChart').getContext('2d');
             var genderPieChart = new Chart(ctxPie, {
                 type: 'doughnut',
@@ -218,6 +495,7 @@
                     }
                 }
             });
+
 
             // Update both charts based on table data
             function updateCharts() {

@@ -196,16 +196,19 @@ body {
     </nav>
     <div class="row justify-content-center">
         <!-- Summary Table -->
-        <div class="col-md-5 mb-2">
+
+        <div class="col-md-5 mb-1">
             <div class="card shadow-sm">
                 <div class="card-header bg-primary text-white">
                     <h2 class="text-center mb-0">Newsletter Summary</h2>
                 </div>
-                <div class="card-body">
+
+                <div class="table-responsive"> <!-- Add this container for responsiveness -->
                     <table class="table table-bordered table-sm text-center">
                         <thead class="thead-light">
                         <tr>
-                        <th>Period</th>
+                            <th>Period</th>
+                            <th>Daily News</th>
                             <th>Guardian</th>
                             <th>Mwananchi</th>
                             <th>Nipashe</th>
@@ -216,11 +219,15 @@ body {
                             <th>Total</th>
                         </tr>
                         </thead>
-                       
                         <tbody>
                         @foreach (['today'=>'Today','yesterday' => 'Yesterday', 'weekly' => 'This Week', 'monthly' => 'This Month', 'lastMonth' => 'Last Month', 'threeMonths' => 'Last Three Months', 'total' => 'TOTAL VISITS'] as $period => $label)
-                        <tr>
+                            <tr>
                                 <td>{{ $label }}</td>
+                                <td>{{ $summary[$period]['Daily News'] }}
+                                    @if ($period === 'today')
+                                        <button class="btn btn-sm btn-outline-danger rounded-circle ml-2 decrement-btn" onclick="decrementCount('Daily News')">-</button>
+                                    @endif
+                                </td>
                                 <td>{{ $summary[$period]['Guardian'] }}
                                     @if ($period === 'today')
                                         <button class="btn btn-sm btn-outline-danger rounded-circle ml-2 decrement-btn" onclick="decrementCount('Guardian')">-</button>
@@ -261,9 +268,10 @@ body {
                         @endforeach
                         </tbody>
                     </table>
-                </div>
+                </div> <!-- End table-responsive -->
             </div>
         </div>
+
 
         <div class="col-md-3 mb-1">
             <div class="card shadow-sm">
@@ -283,6 +291,7 @@ body {
                                 <option value="5">Habari Leo</option>
                                 <option value="6">Citizen</option>
                                 <option value="7">East African</option>
+                                <option value="8">Mwananchi</option>
                             </select>
                             <div class="card-body text-center" style="display:none;" id = "newsletterCount">
                             <input type="number" id="newsletterInput" name ="newsletterInput" class="form-control" >
@@ -291,15 +300,15 @@ body {
                         </div>
                     </form>
 
-                
+
                     <div id="thankYouMessage" style="display:none; margin-top:20px;" class="alert alert-success">
                         Thank you!
                     </div>
                 </div>
                 </div>
 </div>
-     
-    
+
+
         <!-- Visitor Pie Chart -->
         <div class="col-md-4 mb-1">
             <div class="card shadow-sm">
@@ -354,7 +363,38 @@ body {
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        
+        const pieChartData = {
+            labels: ['Daily News', 'Guardian', 'Nipashe', 'Uhuru', 'Habari Leo', 'Citizen', 'East African', 'Mwananchi'],
+            datasets: [{
+                label: 'Newslatter',
+                data: [
+                    {{$summary['today']['Daily News'] ?? 0}},
+                    {{$summary['today']['Guardian'] ?? 0}},
+                    {{$summary['today']['Nipashe'] ?? 0}},
+                    {{$summary['today']['Uhuru'] ?? 0}},
+                    {{$summary['today']['Habari Leo'] ?? 0}},
+                    {{$summary['today']['Citizen'] ?? 0}},
+                    {{$summary['today']['East African'] ?? 0}},
+                    {{$summary['today']['Mwananchi'] ?? 0}}
+                ],
+                backgroundColor: [
+                    '#73721e', // Bright orange-red
+                    '#33FF57', // Bright green
+                    '#3357FF', // Bright blue
+                    '#FF33A8', // Bright pink
+                    '#33FFF2', // Cyan
+                    '#FFB533', // Golden yellow
+                    '#8D33FF', // Purple
+                    '#FF3333'  // Bright red
+                ],
+                borderColor: [
+                    '#ffffff'  // White border for all slices to create separation
+                ],
+                borderWidth: 1
+            }]
+        };
+
+
 
         const ctxPie = document.getElementById('visitorPieChart');
         new Chart(ctxPie, {
@@ -463,18 +503,18 @@ body {
 
 function showNewsLetterSelect() {
     document.getElementById('newsletterSelectContainer').style.display = 'block';
-    checkNewsletterSelection(); 
+    checkNewsletterSelection();
 }
 
 function checkNewsletterSelection() {
     const newsletterValue = document.getElementById('newsletter').value;
     const newsletterCountInput = document.getElementById('newsletterCount');
- 
+
     newsletterInput.value = '';
     if (newsletterValue >= 1) {
         newsletterCountInput.style.display = 'block';
     } else {
-        newsletterCountInput.style.display = 'none'; 
+        newsletterCountInput.style.display = 'none';
     }
 }
 
@@ -530,7 +570,7 @@ function checkNewsletterSelection() {
 }).then(() => {
             window.location.reload(); // Refresh the page after the alert
         });
-        document.getElementById('genderSelectContainer').style.display = 'none';
+        document.getElementById('newsletterSelectContainer').style.display = 'none';
         form.reset();
     }
 })
