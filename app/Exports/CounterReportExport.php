@@ -7,6 +7,7 @@ use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithTitle;
 use Maatwebsite\Excel\Concerns\WithMultipleSheets;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 class CounterReportExport implements WithMultipleSheets
 {
@@ -35,6 +36,7 @@ class CounterSheetExport implements FromCollection, WithHeadings, WithTitle
      */
     public function collection()
     {
+        $today = Carbon::today();
         return DB::table('counters')
             ->select(
                 DB::raw('DATE(counters.created_at) as date'),
@@ -47,6 +49,7 @@ class CounterSheetExport implements FromCollection, WithHeadings, WithTitle
             )
             ->join('users', 'counters.user_id', '=', 'users.id')
             ->whereNull('counters.deleted_at')
+            ->whereDate('counters.created_at', $today)
             ->groupBy(DB::raw('DATE(counters.created_at)'), 'users.id')
             ->orderByDesc(DB::raw('DATE(counters.created_at)'))
             ->get();
@@ -76,6 +79,7 @@ class NewsletterSheetExport implements FromCollection, WithHeadings, WithTitle
      */
     public function collection()
     {
+        $today = Carbon::today();
         return DB::table('news_letters')
             ->select(
                 DB::raw('DATE(news_letters.created_at) as date'),
@@ -91,9 +95,9 @@ class NewsletterSheetExport implements FromCollection, WithHeadings, WithTitle
                 DB::raw("SUM(CASE WHEN news_letters.name IN ('Guardian', 'Nipashe', 'Habari Leo', 'Uhuru', 'East African', 'Mwananchi', 'Citizen', 'Daily News') THEN news_letters.counts ELSE 0 END) as total_count")
             )
             ->join('users', 'news_letters.user_id', '=', 'users.id')
+            ->whereDate('news_letters.created_at', $today) // Filter by today's date
             ->groupBy(DB::raw('DATE(news_letters.created_at)'), 'users.name')
-            ->orderByDesc(DB::raw('DATE(news_letters.created_at)'))
-            ->get();
+            ->orderByDesc(DB::raw('DATE(news_letters.created_at)'))->get();
     }
 
     /**

@@ -259,7 +259,7 @@ body {
                         </div>
                     </form>
 
-                
+
                     <div id="thankYouMessage" style="display:none; margin-top:20px;" class="alert alert-success">
                         Thank you!
                     </div>
@@ -267,7 +267,7 @@ body {
                     <div class="card-body text-center" style="display:none;" id = "multiple">
                         <form id="multiple" action="{{ route('counter.increment.multiple') }}" method="POST" class="mb-3">
                                 @csrf
-                            
+
                                 <div id="genderCounts" style="margin-top:20px;">
                                 <label for="maleCountInput">Male Count:</label>
                                 <input type="number" id="maleCountInput" name ="maleCountInput" class="form-control" >
@@ -284,8 +284,8 @@ body {
                             </div>
                     </div>
                 </div>
-     
-    
+
+
         <!-- Visitor Pie Chart -->
         <div class="col-md-4 mb-1">
             <div class="card shadow-sm">
@@ -298,6 +298,7 @@ body {
             </div>
         </div>
     </div>
+    <script src="https://cdn.pulse.is/livechat/loader.js" data-live-chat-id="67a5c56c81212f461c081862" async></script>
  <!-- Modal Trigger -->
 <!-- Modal Trigger -->
 <div class="message-icon" data-toggle="modal" id="message-icon" data-target="#chatModal">💬</div>
