@@ -536,7 +536,7 @@
                         {
                             label: 'Total Count', // Add a new line for total count
                             data: [],
-                            borderColor: '#000', // Black color for total count line
+                            borderColor: 'Tomato', // Black color for total count line
                             backgroundColor: 'rgba(0, 0, 0, 0.1)',
                             fill: true,
                             tension: 0.4,

@@ -32,7 +32,7 @@ class ExcelMail extends Mailable
         $excelContent = Excel::raw(new CounterReportExport(), \Maatwebsite\Excel\Excel::XLSX);
 
         // Return the email with the attachment
-        return $this->from(new \Illuminate\Mail\Mailables\Address(env('MAIL_FROM_ADDRESS'), env('MAIL_FROM_NAME')))
+        return $this->from('kelvinstony9@gmail.com', env('MAIL_FROM_NAME'))
                     ->subject('VISITORS COUNTER REPORT')
                     ->view('emails.counter')
                     ->with(['summary' => $this->summary])
