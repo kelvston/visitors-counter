@@ -148,6 +148,7 @@
         @endsection
 @push('scripts')
     <!-- Include jQuery, DataTables JS/CSS, Moment.js, Date Range Picker, and Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -427,7 +428,6 @@
                 });
 
 
-                // Donut Chart (Gender Distribution)
             var ctxPie = document.getElementById('genderPieChart').getContext('2d');
             var genderPieChart = new Chart(ctxPie, {
                 type: 'doughnut',
@@ -435,21 +435,72 @@
                     labels: ['Male', 'Female', 'Other'],
                     datasets: [{
                         label: 'Gender Distribution',
-                        data: [0, 0, 0],
-                        backgroundColor: ['#007bff', '#ff4081', '#4caf50'],
+                        data: [0, 0, 0],  // Actual data will be filled dynamically
+                        backgroundColor: [
+                            'rgba(0, 123, 255, 0.8)',  // Gradient Blue
+                            'rgba(255, 64, 129, 0.8)',  // Gradient Pink
+                            'rgba(76, 175, 80, 0.8)'    // Gradient Green
+                        ],
                         borderColor: ['#007bff', '#ff4081', '#4caf50'],
-                        borderWidth: 1
+                        borderWidth: 3
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: {
-                        legend: { position: 'top' },
-                        tooltip: { callbacks: { label: function(tooltipItem) { return tooltipItem.label + ': ' + tooltipItem.raw + ' users'; }}}
-                    }
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                boxWidth: 15,
+                                font: {
+                                    size: 14
+                                }
+                            }
+                        },
+                        tooltip: {
+                            enabled: true,
+                            callbacks: {
+                                label: function(tooltipItem) {
+                                    let dataset = tooltipItem.dataset;
+                                    let total = dataset.data.reduce((sum, currentValue) => sum + currentValue, 0);
+                                    let percentage = Math.round((tooltipItem.raw / total) * 100);
+                                    return tooltipItem.label + ': ' + tooltipItem.raw + ' users (' + percentage + '%)';
+                                }
+                            }
+                        },
+                        datalabels: {
+                            color: 'white',
+                            formatter: (value, context) => {
+                                let total = context.dataset.data.reduce((sum, currentValue) => sum + currentValue, 0);
+                                if (context.dataIndex === undefined) { // If no dataIndex, we're at the center
+                                    return total; // Show total number of users in the center
+                                } else {
+                                    let percentage = Math.round((value / total) * 100);
+                                    return percentage + '%';
+                                }
+                            },
+                            font: {
+                                weight: 'bold',
+                                size: 16
+                            },
+                            anchor: 'center',
+                            align: 'center',
+                            offset: 0,  // Center the labels
+                            display: function(context) {
+                                return context.dataIndex === undefined; // Display only in the center
+                            }
+                        }
+                    },
+                    animation: {
+                        animateScale: true,
+                        animateRotate: true
+                    },
+                    cutoutPercentage: 70,  // Increase the inner cutout to make it look more like a donut
+                    rotation: -0.5 * Math.PI  // Adjust rotation of the chart for better aesthetic
                 }
             });
+
 
             // Line Chart (Gender Distribution Over Time)
             var ctxLine = document.getElementById('genderTrendChart').getContext('2d');
@@ -457,28 +508,41 @@
                 type: 'line',
                 data: {
                     labels: [],
-                    datasets: [{
-                        label: 'Male',
-                        data: [],
-                        borderColor: '#007bff',
-                        backgroundColor: 'rgba(0, 123, 255, 0.2)',
-                        fill: true,
-                        tension: 0.4
-                    }, {
-                        label: 'Female',
-                        data: [],
-                        borderColor: '#ff4081',
-                        backgroundColor: 'rgba(255, 64, 129, 0.2)',
-                        fill: true,
-                        tension: 0.4
-                    }, {
-                        label: 'Other',
-                        data: [],
-                        borderColor: '#4caf50',
-                        backgroundColor: 'rgba(76, 175, 80, 0.2)',
-                        fill: true,
-                        tension: 0.4
-                    }]
+                    datasets: [
+                        {
+                            label: 'Male',
+                            data: [],
+                            borderColor: '#007bff',
+                            backgroundColor: 'rgba(0, 123, 255, 0.2)',
+                            fill: true,
+                            tension: 0.4
+                        },
+                        {
+                            label: 'Female',
+                            data: [],
+                            borderColor: '#ff4081',
+                            backgroundColor: 'rgba(255, 64, 129, 0.2)',
+                            fill: true,
+                            tension: 0.4
+                        },
+                        {
+                            label: 'Other',
+                            data: [],
+                            borderColor: '#4caf50',
+                            backgroundColor: 'rgba(76, 175, 80, 0.2)',
+                            fill: true,
+                            tension: 0.4
+                        },
+                        {
+                            label: 'Total Count', // Add a new line for total count
+                            data: [],
+                            borderColor: '#000', // Black color for total count line
+                            backgroundColor: 'rgba(0, 0, 0, 0.1)',
+                            fill: true,
+                            tension: 0.4,
+                            borderWidth: 2 // Optional, for better visibility
+                        }
+                    ]
                 },
                 options: {
                     responsive: true,
@@ -496,11 +560,10 @@
                 }
             });
 
-
-            // Update both charts based on table data
+// Update both charts based on table data
             function updateCharts() {
-                var maleCount = 0, femaleCount = 0, otherCount = 0;
-                var dates = [], maleData = [], femaleData = [], otherData = [];
+                var maleCount = 0, femaleCount = 0, otherCount = 0, totalCount = 0;
+                var dates = [], maleData = [], femaleData = [], otherData = [], totalData = [];
                 var filteredData = table.rows({ filter: 'applied' }).data();
 
                 // If no filters, use all data
@@ -515,16 +578,20 @@
 
                     // Trend data for line chart
                     var date = moment(row[0]).format('YYYY-MM-DD');
+                    var totalForDate = parseInt(row[2]) + parseInt(row[3]) + parseInt(row[4]);
+
                     if (!dates.includes(date)) {
                         dates.push(date);
                         maleData.push(parseInt(row[2]));
                         femaleData.push(parseInt(row[3]));
                         otherData.push(parseInt(row[4]));
+                        totalData.push(totalForDate); // Add total count for this date
                     } else {
                         var index = dates.indexOf(date);
                         maleData[index] += parseInt(row[2]);
                         femaleData[index] += parseInt(row[3]);
                         otherData[index] += parseInt(row[4]);
+                        totalData[index] += totalForDate; // Add total count for this date
                     }
                 });
 
@@ -533,7 +600,8 @@
                     date: date,
                     male: maleData[index],
                     female: femaleData[index],
-                    other: otherData[index]
+                    other: otherData[index],
+                    total: totalData[index]
                 }));
 
                 sortedData.sort(function(a, b) {
@@ -545,6 +613,7 @@
                 maleData = sortedData.map(item => item.male);
                 femaleData = sortedData.map(item => item.female);
                 otherData = sortedData.map(item => item.other);
+                totalData = sortedData.map(item => item.total);
 
                 // Update Donut Chart
                 genderPieChart.data.datasets[0].data = [maleCount, femaleCount, otherCount];
@@ -555,11 +624,13 @@
                 genderTrendChart.data.datasets[0].data = maleData;
                 genderTrendChart.data.datasets[1].data = femaleData;
                 genderTrendChart.data.datasets[2].data = otherData;
+                genderTrendChart.data.datasets[3].data = totalData; // Update total count line
                 genderTrendChart.update();
             }
 
-            // Initialize charts with general data on page load
+// Initialize charts with general data on page load
             updateCharts();
+
         });
     </script>
 @endpush

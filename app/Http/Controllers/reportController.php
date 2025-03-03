@@ -18,17 +18,19 @@ class reportController extends Controller
             ->select(
                 DB::raw('DATE(counters.created_at) as date'),
                 'users.id as user_id',
-                DB::raw('SUM(CASE WHEN counters.gender = 1 THEN 1 ELSE 0 END) as male_count'),
-                DB::raw('SUM(CASE WHEN counters.gender = 2 THEN 1 ELSE 0 END) as female_count'),
-                DB::raw('SUM(CASE WHEN counters.gender = 3 THEN 1 ELSE 0 END) as other_count'),
-                DB::raw('COUNT(*) as total_count'),
-                'users.*',
+                'users.name', // Explicitly select 'name' from 'users'
+                DB::raw('SUM(CASE WHEN counters.gender = 1 THEN counters.counts ELSE 0 END) as male_count'),
+                DB::raw('SUM(CASE WHEN counters.gender = 2 THEN counters.counts ELSE 0 END) as female_count'),
+                DB::raw('SUM(CASE WHEN counters.gender = 3 THEN counters.counts ELSE 0 END) as other_count'),
+                DB::raw('SUM(counters.counts) as total_count') // Sum all counts for each user per date
             )
             ->join('users', 'counters.user_id', '=', 'users.id')
             ->whereNull('counters.deleted_at')
-            ->groupBy(DB::raw('DATE(counters.created_at)'), 'users.id')
+            ->groupBy(DB::raw('DATE(counters.created_at)'), 'users.id', 'users.name') // Group by date, user_id, and name
             ->orderByDesc(DB::raw('DATE(counters.created_at)'))
             ->get();
+
+
 
         $news = DB::table('news_letters')
             ->select(
