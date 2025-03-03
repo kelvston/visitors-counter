@@ -8,6 +8,8 @@
         <li class="nav-item">
             <a class="nav-link" data-toggle="tab" href="#newsletters">Newsletter Report</a>
         </li>
+
+
     </ul>
     <div class="tab-content mt-4">
         <!-- Visitors Report -->
@@ -67,11 +69,26 @@
             </table>
             <div class="row">
                 <div class="col-md-8">
-                    <canvas id="genderTrendChart" style="height:400px;"></canvas>
+                    <canvas id="genderTrendChart" style="height:400px;" ></canvas>
                 </div>
                 <div class="col-md-4">
                     <canvas id="genderPieChart" style="width:100%; height:100%;"></canvas>
                 </div>
+{{--                <canvas id="visitorTrendChart" width="400" height="200"></canvas>--}}
+            </div>
+
+            <div class="row">
+                <div class="col-md-8">
+                    <canvas id="seasonalityChart" width="400" height="200"></canvas>
+                </div>
+                <div class="col-md-4">
+                    <canvas id="movingAvgChart" width="400" height="200"></canvas>
+                </div>
+                <div class="col-md-8">
+                    <canvas id="visitorTrendChart" width="400" height="200"></canvas>
+                </div>
+
+
             </div>
         </div>
         <!-- Newsletter Report -->
@@ -146,8 +163,10 @@
 
 
         @endsection
+
+
 @push('scripts')
-    <!-- Include jQuery, DataTables JS/CSS, Moment.js, Date Range Picker, and Chart.js -->
+
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
@@ -165,8 +184,13 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/laravel-excel@3.1.0/dist/js/laravel-excel.min.js"></script>
 
+    <script src="https://cdn.jsdelivr.net/npm/simple-statistics@7.0.0/dist/simple-statistics.min.js"></script>
+
     <script>
+
         $(document).ready(function() {
+            document.getElementById("visitorTrendChart").style.display = "none";
+
             // Initialize DataTable
             var table = $('#visitorTable').DataTable({
                 responsive: true,
@@ -195,6 +219,7 @@
                 }
             });
 
+            // analyzeVisitorTrend();
             // Newsletter Date Range Picker
             $('#dateRangeNew').daterangepicker({
                 autoUpdateInput: false,
@@ -206,20 +231,19 @@
                     'Last 30 Days': [moment().subtract(29, 'days'), moment()],
                 }
             });
-
             $('#dateRange').on('apply.daterangepicker', function(ev, picker) {
                 var startDate = picker.startDate.format('YYYY-MM-DD');
                 var endDate = picker.endDate.format('YYYY-MM-DD');
 
-                $.fn.dataTable.ext.search.push(
-                    function(settings, data, dataIndex) {
-                        var rowDate = moment(data[0], 'YYYY-MM-DD').format('YYYY-MM-DD');
-                        return rowDate >= startDate && rowDate <= endDate;
-                    }
-                );
+                $.fn.dataTable.ext.search.push(function(settings, data, dataIndex) {
+                    var rowDate = moment(data[0], 'YYYY-MM-DD').format('YYYY-MM-DD');
+                    return rowDate >= startDate && rowDate <= endDate;
+                });
                 table.draw();
                 updateCharts();
+                predictVisitorTrend(); // Call the prediction function after filtering data
             });
+
             $('#dateRangeNew').on('apply.daterangepicker', function(ev, picker) {
                 var startDate = picker.startDate.format('YYYY-MM-DD');
                 var endDate = picker.endDate.format('YYYY-MM-DD');
@@ -428,6 +452,7 @@
                 });
 
 
+
             var ctxPie = document.getElementById('genderPieChart').getContext('2d');
             var genderPieChart = new Chart(ctxPie, {
                 type: 'doughnut',
@@ -502,12 +527,65 @@
             });
 
 
-            // Line Chart (Gender Distribution Over Time)
-            var ctxLine = document.getElementById('genderTrendChart').getContext('2d');
-            var genderTrendChart = new Chart(ctxLine, {
+            function updateChartsFromGenderTrend() {
+                var labels = genderTrendChart.data.labels;
+                var maleData = genderTrendChart.data.datasets[0].data;
+                var femaleData = genderTrendChart.data.datasets[1].data;
+                var otherData = genderTrendChart.data.datasets[2].data;
+
+                var totalData = maleData.map((val, index) => val + femaleData[index] + otherData[index]);
+
+                var movingAvgData = [];
+                var windowSize = 7;
+                for (let i = 0; i < totalData.length; i++) {
+                    let windowData = totalData.slice(Math.max(0, i - windowSize + 1), i + 1);
+                    let avg = windowData.reduce((a, b) => a + b, 0) / windowData.length;
+                    movingAvgData.push(avg);
+                }
+
+                var monthlyData = {};
+                labels.forEach((date, index) => {
+                    var month = moment(date).format('MMMM');
+                    monthlyData[month] = (monthlyData[month] || 0) + totalData[index];
+                });
+
+                var months = Object.keys(monthlyData);
+                var monthCounts = months.map(month => monthlyData[month]);
+
+                visitorTrendChart.data.labels = labels;
+                visitorTrendChart.data.datasets[0].data = maleData;
+                visitorTrendChart.data.datasets[1].data = femaleData;
+                visitorTrendChart.data.datasets[2].data = otherData;
+                visitorTrendChart.data.datasets[3].data = totalData;
+                visitorTrendChart.update();
+
+                movingAvgChart.data.labels = labels;
+                movingAvgChart.data.datasets[0].data = movingAvgData;
+                movingAvgChart.update();
+
+                seasonalityChart.data.labels = months;
+                seasonalityChart.data.datasets[0].data = monthCounts;
+                seasonalityChart.update();
+            }
+
+            setTimeout(updateChartsFromGenderTrend, 1000);
+
+
+            // Initialize the chart containers
+            var ctxVisitorTrend = document.getElementById('visitorTrendChart').getContext('2d');
+            var ctxMovingAvg = document.getElementById('movingAvgChart').getContext('2d');
+            var ctxSeasonality = document.getElementById('seasonalityChart').getContext('2d');
+
+// Visitor Trend Chart (Gender Distribution Over Time)
+
+            if (visitorTrendChart) {
+                visitorTrendChart.destroy();
+            }
+
+            var visitorTrendChart = new Chart(ctxVisitorTrend, {
                 type: 'line',
                 data: {
-                    labels: [],
+                    labels: [],  // Dates will go here
                     datasets: [
                         {
                             label: 'Male',
@@ -521,6 +599,220 @@
                             label: 'Female',
                             data: [],
                             borderColor: '#ff4081',
+                            backgroundColor: 'rgba(255, 64, 129, 0.2)',
+                            fill: true,
+                            tension: 0.4
+                        },
+                        {
+                            label: 'Other',
+                            data: [],
+                            borderColor: '#4caf50',
+                            backgroundColor: 'rgba(76, 175, 80, 0.2)',
+                            fill: true,
+                            tension: 0.4
+                        },
+                        {
+                            label: 'Total Count',
+                            data: [],
+                            borderColor: 'Tomato',
+                            backgroundColor: 'rgba(0, 0, 0, 0.1)',
+                            fill: true,
+                            tension: 0.4,
+                            borderWidth: 2
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            type: 'category',
+                            title: { display: true, text: 'Gender distribution analysis per date' }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            title: { display: true, text: 'Gender Count' }
+                        }
+                    }
+                }
+            });
+
+// Moving Average Chart (Simple Moving Average or SMA)
+            var movingAvgChart = new Chart(ctxMovingAvg, {
+                type: 'line',
+                data: {
+                    labels: [],  // Dates will go here
+                    datasets: [
+                        {
+                            label: 'Moving Average',
+                            data: [],
+                            borderColor: '#ff9900',
+                            backgroundColor: 'rgba(255, 153, 0, 0.2)',
+                            fill: true,
+                            tension: 0.4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            type: 'category',
+                            title: { display: true, text: 'Date' }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            title: { display: true, text: 'Average Count' }
+                        }
+                    }
+                }
+            });
+
+// Seasonality Chart (Yearly, Monthly Seasonality or any Periodic Trend)
+            var seasonalityChart = new Chart(ctxSeasonality, {
+                type: 'bar',
+                data: {
+                    labels: [],  // Months or Periods will go here
+                    datasets: [
+                        {
+                            label: 'Visitor Count',
+                            data: [],
+                            borderColor: '#32cd32',
+                            backgroundColor: 'rgba(50,205,200,0.2)',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            type: 'category',
+                            title: { display: true, text: 'Monthly chart' }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            title: { display: true, text: 'Visitor Count' }
+                        }
+                    }
+                }
+            });
+
+// Update charts based on table data
+            function updateCharts() {
+                var maleCount = 0, femaleCount = 0, otherCount = 0, totalCount = 0;
+                var dates = [], maleData = [], femaleData = [], otherData = [], totalData = [];
+                var movingAvgData = [];
+                var monthlyData = {};
+                var filteredData = table.rows({ filter: 'applied' }).data();
+
+                // If no filters, use all data
+                if (filteredData.length === 0) {
+                    filteredData = table.rows().data();
+                }
+
+                filteredData.each(function(row) {
+                    maleCount += parseInt(row[2]);
+                    femaleCount += parseInt(row[3]);
+                    otherCount += parseInt(row[4]);
+
+                    // Gender distribution for trend chart
+                    var date = moment(row[0]).format('YYYY-MM-DD');
+                    var totalForDate = parseInt(row[2]) + parseInt(row[3]) + parseInt(row[4]);
+
+                    if (!dates.includes(date)) {
+                        dates.push(date);
+                        maleData.push(parseInt(row[2]));
+                        femaleData.push(parseInt(row[3]));
+                        otherData.push(parseInt(row[4]));
+                        totalData.push(totalForDate);
+                    } else {
+                        var index = dates.indexOf(date);
+                        maleData[index] += parseInt(row[2]);
+                        femaleData[index] += parseInt(row[3]);
+                        otherData[index] += parseInt(row[4]);
+                        totalData[index] += totalForDate;
+                    }
+
+                    // Monthly data for seasonality
+                    var month = moment(row[0]).format('MMMM');
+                    if (!monthlyData[month]) {
+                        monthlyData[month] = 0;
+                    }
+                    monthlyData[month] += totalForDate;
+                });
+
+                // Calculate Moving Average (e.g., 7-day moving average)
+                var windowSize = 5;  // You can adjust this for longer or shorter moving averages
+                for (let i = 0; i < totalData.length; i++) {
+                    let windowData = totalData.slice(Math.max(0, i - windowSize + 1), i + 1);
+                    let avg = windowData.reduce((a, b) => a + b, 0) / windowData.length;
+                    movingAvgData.push(avg);
+                }
+
+                // Prepare sorted data
+                var sortedData = dates.map((date, index) => ({
+                    date: date,
+                    male: maleData[index],
+                    female: femaleData[index],
+                    other: otherData[index],
+                    total: totalData[index]
+                }));
+
+                sortedData.sort(function(a, b) {
+                    return moment(a.date).isBefore(moment(b.date)) ? -1 : 1;
+                });
+
+                // Extract sorted values
+                dates = sortedData.map(item => item.date);
+                maleData = sortedData.map(item => item.male);
+                femaleData = sortedData.map(item => item.female);
+                otherData = sortedData.map(item => item.other);
+                totalData = sortedData.map(item => item.total);
+
+                // Update Visitor Trend Chart (Gender Distribution Over Time)
+                visitorTrendChart.data.labels = dates;
+                visitorTrendChart.data.datasets[0].data = maleData;
+                visitorTrendChart.data.datasets[1].data = femaleData;
+                visitorTrendChart.data.datasets[2].data = otherData;
+                visitorTrendChart.data.datasets[3].data = totalData;
+                visitorTrendChart.update();
+
+                // Update Moving Average Chart
+                movingAvgChart.data.labels = dates;
+                movingAvgChart.data.datasets[0].data = movingAvgData;
+                movingAvgChart.update();
+
+                // Update Seasonality Chart (Monthly Trends)
+                var months = Object.keys(monthlyData);
+                var monthCounts = months.map(month => monthlyData[month]);
+                seasonalityChart.data.labels = months;
+                seasonalityChart.data.datasets[0].data = monthCounts;
+                seasonalityChart.update();
+            }
+
+            // Line Chart (Gender Distribution Over Time)
+            var ctxLine = document.getElementById('genderTrendChart').getContext('2d');
+            var genderTrendChart = new Chart(ctxLine, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [
+                        {
+                            label: 'Male',
+                            data: [],
+                            borderColor: '#5eff00',
+                            backgroundColor: 'rgba(0, 123, 255, 0.2)',
+                            fill: true,
+                            tension: 0.4
+                        },
+                        {
+                            label: 'Female',
+                            data: [],
+                            borderColor: '#b8172f',
                             backgroundColor: 'rgba(255, 64, 129, 0.2)',
                             fill: true,
                             tension: 0.4
@@ -564,6 +856,8 @@
             function updateCharts() {
                 var maleCount = 0, femaleCount = 0, otherCount = 0, totalCount = 0;
                 var dates = [], maleData = [], femaleData = [], otherData = [], totalData = [];
+                var movingAvgData = [];
+                var monthlyData = {};
                 var filteredData = table.rows({ filter: 'applied' }).data();
 
                 // If no filters, use all data
@@ -593,7 +887,24 @@
                         otherData[index] += parseInt(row[4]);
                         totalData[index] += totalForDate; // Add total count for this date
                     }
+
+                    // Monthly data for seasonality
+                    var month = moment(row[0]).format('MMMM');
+                    if (!monthlyData[month]) {
+                        monthlyData[month] = 0;
+                    }
+                    monthlyData[month] += totalForDate;
                 });
+
+                // Calculate Moving Average (e.g., 7-day moving average) for filtered data
+                var windowSize = 5;  // You can adjust this for longer or shorter moving averages
+                movingAvgData = [];   // Clear previous moving average data
+
+                for (let i = 0; i < totalData.length; i++) {
+                    let windowData = totalData.slice(Math.max(0, i - windowSize + 1), i + 1);
+                    let avg = windowData.reduce((a, b) => a + b, 0) / windowData.length;
+                    movingAvgData.push(avg);
+                }
 
                 // Sort dates and data in ascending order based on dates
                 var sortedData = dates.map((date, index) => ({
@@ -626,7 +937,21 @@
                 genderTrendChart.data.datasets[2].data = otherData;
                 genderTrendChart.data.datasets[3].data = totalData; // Update total count line
                 genderTrendChart.update();
+
+                // Update Moving Average Chart
+                movingAvgChart.data.labels = dates;
+                movingAvgChart.data.datasets[0].data = movingAvgData;
+                movingAvgChart.update();
+
+                // Update Seasonality Chart (Monthly Trends)
+                var months = Object.keys(monthlyData);
+                var monthCounts = months.map(month => monthlyData[month]);
+                seasonalityChart.data.labels = months;
+                seasonalityChart.data.datasets[0].data = monthCounts;
+                seasonalityChart.update();
             }
+
+
 
 // Initialize charts with general data on page load
             updateCharts();

@@ -20,6 +20,8 @@
         "datatables.net": "^2.1.8",
         "datatables.net-bs5": "^2.1.8",
         "datatables.net-dt": "^2.1.8",
-        "jquery": "^3.7.1"
+        "jquery": "^3.7.1",
+        "ml-regression": "^6.2.0",
+        "regression": "^2.0.1"
     }
 }
