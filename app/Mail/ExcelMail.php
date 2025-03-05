@@ -28,11 +28,12 @@ class ExcelMail extends Mailable
      */
     public function build()
     {
-        // Generate the Excel file in memory with both sheets
+        // Generate the Excel file in memory with both sheets  ephraemsilayo20@gmail.com
         $excelContent = Excel::raw(new CounterReportExport(), \Maatwebsite\Excel\Excel::XLSX);
 
         // Return the email with the attachment
-        return $this->from('kelvinstony9@gmail.com', env('MAIL_FROM_NAME'))
+                    return $this->from('kelvinstony9@gmail.com')
+                    ->to(['ephraemsilayo20@gmail.com'])
                     ->subject('VISITORS COUNTER REPORT')
                     ->view('emails.counter')
                     ->with(['summary' => $this->summary])

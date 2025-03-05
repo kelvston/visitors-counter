@@ -296,6 +296,9 @@ body {
                             <div class="card-body text-center" style="display:none;" id = "newsletterCount">
                             <input type="number" id="newsletterInput" name ="newsletterInput" class="form-control" >
                             </div>
+                            <div class="card-body text-center" style="display:none;" id = "dateCount">
+                                <input type="date" id="dateCountInput" name ="dateCountInput" class="form-control" >
+                            </div>
                             <button type="submit" class="btn btn-success mt-3">Submit</button>
                         </div>
                     </form>
@@ -509,10 +512,12 @@ function showNewsLetterSelect() {
 function checkNewsletterSelection() {
     const newsletterValue = document.getElementById('newsletter').value;
     const newsletterCountInput = document.getElementById('newsletterCount');
+    const dateCountInput = document.getElementById('dateCount');
 
     newsletterInput.value = '';
     if (newsletterValue >= 1) {
         newsletterCountInput.style.display = 'block';
+        dateCountInput.style.display = 'block';
     } else {
         newsletterCountInput.style.display = 'none';
     }

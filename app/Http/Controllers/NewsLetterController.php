@@ -92,9 +92,12 @@ class NewsLetterController extends Controller
      */
 
     public function store(Request $request){
+
         $user = Auth::user();
     $newsletter = $request['newsletter'];
     $input = $request['newsletterInput'];
+    $date = $request['dateCountInput'];
+
    $name = null;
     switch($newsletter){
         case 1:
@@ -124,15 +127,18 @@ class NewsLetterController extends Controller
     }
 
     if ($input > 0) {
+
         $news = NewsLetter::firstOrCreate(
             [
                 'user_id' => $user->id,
                 'name' => $name,
-                'created_at' => Carbon::today()
             ],
             ['counts' => 0]
         );
         $news->increment('counts', $input);
+        $news->created_at = $date;
+        $news->updated_at = $date;
+        $news->save();
     }
 
     if ($request->ajax()) {
