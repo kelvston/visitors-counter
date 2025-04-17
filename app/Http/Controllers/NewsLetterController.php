@@ -98,6 +98,7 @@ class NewsLetterController extends Controller
     $input = $request['newsletterInput'];
     $date = $request['dateCountInput'];
 
+
    $name = null;
     switch($newsletter){
         case 1:
@@ -128,17 +129,28 @@ class NewsLetterController extends Controller
 
     if ($input > 0) {
 
-        $news = NewsLetter::firstOrCreate(
-            [
-                'user_id' => $user->id,
+        // $news = NewsLetter::firstOrCreate(
+        //     [
+        //         'user_id' => $user->id,
+        //         'name' => $name,
+        //     ],
+        //     ['counts' => 0]
+        // );
+        // $news->increment('counts', $input);
+        // $news->created_at = $date;
+        // $news->updated_at = $date;
+        // $news->save();
+
+        $news = NewsLetter::create(
+            ['user_id' => $user->id,
                 'name' => $name,
-            ],
-            ['counts' => 0]
-        );
-        $news->increment('counts', $input);
+                'counts'=>$input
+            ]);
+        // $news->increment('counts', $input);
         $news->created_at = $date;
         $news->updated_at = $date;
         $news->save();
+
     }
 
     if ($request->ajax()) {
