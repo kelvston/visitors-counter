@@ -1,8 +1,0 @@
-{
-  "labels":[
-    "total_visits_by_gender_in_month",
-    "total_visits_by_gender_in_period"
-  ],
-  "threshold":0.0,
-  "positive_label":null
-}

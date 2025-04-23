@@ -183,7 +183,99 @@ body {
     .decrement-btn:active {
         box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.2); /* Inset shadow when active */
     }
+    /* Floating button */
+    .chat-toggle {
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        background-color: #4caf50;
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 60px;
+        height: 60px;
+        font-size: 30px;
+        cursor: pointer;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
 
+    /* Chat container */
+    .chat-container {
+        position: fixed;
+        bottom: 100px;
+        right: 30px;
+        width: 350px;
+        max-height: 500px;
+        background: white;
+        border: 2px solid #a2e3a2;
+        border-radius: 15px;
+        display: none;
+        flex-direction: column;
+        box-shadow: 0 0 20px rgba(0,0,0,0.2);
+        animation: fadeIn 0.3s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .chat-box {
+        flex: 1;
+        padding: 15px;
+        overflow-y: auto;
+    }
+
+    .message {
+        margin: 10px 0;
+        max-width: 75%;
+        padding: 10px 15px;
+        border-radius: 20px;
+        line-height: 1.4;
+        font-size: 14px;
+    }
+
+    .user {
+        background-color: #d0ebff;
+        align-self: flex-end;
+        border-bottom-right-radius: 0;
+    }
+
+    .bot {
+        background-color: #e3fce4;
+        align-self: flex-start;
+        border-bottom-left-radius: 0;
+    }
+
+    .input-area {
+        display: flex;
+        border-top: 1px solid #ddd;
+        padding: 10px;
+    }
+
+    .input-area input {
+        flex: 1;
+        border: 1px solid #ccc;
+        padding: 10px;
+        border-radius: 10px;
+    }
+
+    .input-area button {
+        margin-left: 10px;
+        background: #4caf50;
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 10px;
+        cursor: pointer;
+    }
+
+    .typing {
+        font-size: 13px;
+        font-style: italic;
+        color: #777;
+        margin-left: 10px;
+    }
 
 </style>
 @section('content')
@@ -298,37 +390,53 @@ body {
             </div>
         </div>
     </div>
-    <script src="https://cdn.pulse.is/livechat/loader.js" data-live-chat-id="67a5c56c81212f461c081862" async></script>
+{{--    <script src="https://cdn.pulse.is/livechat/loader.js" data-live-chat-id="67a5c56c81212f461c081862" async></script>--}}
  <!-- Modal Trigger -->
 <!-- Modal Trigger -->
-<div class="message-icon" data-toggle="modal" id="message-icon" data-target="#chatModal">💬</div>
+{{--<div class="message-icon" data-toggle="modal" id="message-icon" data-target="#chatModal">💬</div>--}}
+{{--<!-- Modal -->--}}
+{{--<div class="modal fade" id="chatModal" tabindex="-1" role="dialog" aria-labelledby="chatModalLabel" aria-hidden="true">--}}
+{{--    <div class="modal-dialog modal-sm custom-size" role="document"> <!-- Added modal-sm and custom-size classes -->--}}
+{{--        <div class="modal-content">--}}
+{{--            <div class="modal-header">--}}
+{{--                <h5 class="modal-title" id="chatModalLabel">Chatbot</h5>--}}
+{{--                <button type="button" class="close" data-dismiss="modal" aria-label="Close">--}}
+{{--                    <span aria-hidden="true">&times;</span>--}}
+{{--                </button>--}}
+{{--            </div>--}}
+{{--            <div class="modal-body">--}}
 
-<!-- Modal -->
-<div class="modal fade" id="chatModal" tabindex="-1" role="dialog" aria-labelledby="chatModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-sm custom-size" role="document"> <!-- Added modal-sm and custom-size classes -->
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="chatModalLabel">Chatbot</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
+{{--                    <div class="chat-box">--}}
+{{--                        <div class="chat-log" id="chat-log"></div>--}}
+{{--                        <meta name="csrf-token" content="{{ csrf_token() }}">--}}
+{{--                        <div class="chat-input-container">--}}
+{{--                            <input type="text" id="chat-input" class="chat-input" placeholder="Type a message...">--}}
+{{--                            <button class="send-button" onclick="sendMessage()">Send</button>--}}
+{{--                        </div>--}}
+{{--                    </div>--}}
+{{--                </div>--}}
+{{--            </div>--}}
+{{--        </div>--}}
+{{--    </div>--}}
 
-                    <div class="chat-box">
-                        <div class="chat-log" id="chat-log"></div>
-                        <meta name="csrf-token" content="{{ csrf_token() }}">
-                        <div class="chat-input-container">
-                            <input type="text" id="chat-input" class="chat-input" placeholder="Type a message...">
-                            <button class="send-button" onclick="sendMessage()">Send</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
+{{--    <form onsubmit="sendMessage(); return false;">--}}
+{{--        <input type="text" id="user-input" placeholder="Ask me something..." />--}}
+{{--        <button type="submit">Send</button>--}}
+{{--    </form>--}}
+    <!-- Toggle button -->
+    <button class="chat-toggle" onclick="toggleChat()">💬</button>
+
+    <!-- Chat UI -->
+    <div class="chat-container" id="chat-container">
+        <div class="chat-box" id="chat-box">
+            <div class="message bot">Hi! I'm your library assistant. How can I help you today?</div>
+        </div>
+        <div class="typing" id="typing" style="display:none;">Bot is typing...</div>
+        <div class="input-area">
+            <input type="text" id="user-input" placeholder="Type your question...">
+            <button onclick="sendMessage()">Send</button>
         </div>
     </div>
-
-
 
 @endsection
 
@@ -340,6 +448,55 @@ body {
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
+    function toggleChat() {
+        const chat = document.getElementById("chat-container");
+        const input = document.getElementById("user-input");
+        chat.style.display = chat.style.display === "flex" ? "none" : "flex";
+        setTimeout(() => input.focus(), 100); // Auto-focus after animation
+    }
+
+    function appendMessage(message, sender) {
+        const box = document.getElementById('chat-box');
+        const div = document.createElement('div');
+        div.className = 'message ' + sender;
+        div.textContent = message;
+        box.appendChild(div);
+        box.scrollTop = box.scrollHeight;
+    }
+
+    function sendMessage() {
+        const input = document.getElementById('user-input');
+        const message = input.value.trim();
+        if (!message) return;
+
+        appendMessage(message, 'user');
+        input.value = '';
+        showTyping(true);
+
+        fetch('/chatbot', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({ message: message })
+        })
+            .then(res => res.json())
+            .then(data => {
+                showTyping(false);
+                appendMessage(data.reply, 'bot');
+            })
+            .catch(() => {
+                showTyping(false);
+                appendMessage('Sorry, something went wrong.', 'bot');
+            });
+    }
+
+    function showTyping(show) {
+        document.getElementById('typing').style.display = show ? 'block' : 'none';
+    }
+
+
     document.addEventListener('DOMContentLoaded', function () {
         const pieChartData = {
             labels: ['Male', 'Female', 'Other'],
@@ -410,47 +567,47 @@ body {
             $('#chatModal').modal('show');
         });
     });
-    function sendMessage() {
-    var messageInput = document.getElementById('chat-input');
-    var message = messageInput.value.trim();
-
-    if (message === '') {
-        alert('Please enter a message.');
-        return;
-    }
-
-    $.ajax({
-        url: '/chatbot',
-        method: 'POST',
-        data: {
-            message: message,
-            _token: document.querySelector('meta[name="csrf-token"]').getAttribute('content') // CSRF token
-        },
-        success: function(response) {
-            var chatLog = document.getElementById('chat-log');
-
-            // User Message
-            var userMessageElement = document.createElement('div');
-            userMessageElement.classList.add('user-message');
-            userMessageElement.innerHTML = `<div class="message-content">You: ${message}</div>`;
-            chatLog.appendChild(userMessageElement);
-
-            // Bot Response
-            var responseMessageElement = document.createElement('div');
-            responseMessageElement.classList.add('bot-message');
-            responseMessageElement.innerHTML = `<div class="message-content">Bot: ${response.totalVisits !== undefined ? 'Total Visits: ' + response.totalVisits : response.message}</div>`;
-            chatLog.appendChild(responseMessageElement);
-
-            messageInput.value = '';
-            chatLog.scrollTop = chatLog.scrollHeight; // Scroll to bottom
-
-            console.log('Message sent:', response);
-        },
-        error: function(xhr, status, error) {
-            console.error('Error sending message:', error);
-        }
-    });
-}
+//     function sendMessage() {
+//     var messageInput = document.getElementById('chat-input');
+//     var message = messageInput.value.trim();
+//
+//     if (message === '') {
+//         alert('Please enter a message.');
+//         return;
+//     }
+//
+//     $.ajax({
+//         url: '/chatbot',
+//         method: 'POST',
+//         data: {
+//             message: message,
+//             _token: document.querySelector('meta[name="csrf-token"]').getAttribute('content') // CSRF token
+//         },
+//         success: function(response) {
+//             var chatLog = document.getElementById('chat-log');
+//
+//             // User Message
+//             var userMessageElement = document.createElement('div');
+//             userMessageElement.classList.add('user-message');
+//             userMessageElement.innerHTML = `<div class="message-content">You: ${message}</div>`;
+//             chatLog.appendChild(userMessageElement);
+//
+//             // Bot Response
+//             var responseMessageElement = document.createElement('div');
+//             responseMessageElement.classList.add('bot-message');
+//             responseMessageElement.innerHTML = `<div class="message-content">Bot: ${response.totalVisits !== undefined ? 'Total Visits: ' + response.totalVisits : response.message}</div>`;
+//             chatLog.appendChild(responseMessageElement);
+//
+//             messageInput.value = '';
+//             chatLog.scrollTop = chatLog.scrollHeight; // Scroll to bottom
+//
+//             console.log('Message sent:', response);
+//         },
+//         error: function(xhr, status, error) {
+//             console.error('Error sending message:', error);
+//         }
+//     });
+// }
 
 
     function showGenderSelect() {

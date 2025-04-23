@@ -162,9 +162,9 @@ class VisitorsCounterController extends Controller
         $pythonScript = 'C:/xampp/htdocs/visitor-counter/analyze_text_spacy.py';
         $pythonExecutable = 'C:/Users/yoga/AppData/Local/Programs/Python/Python312/python.exe';
 
-        $command = escapeshellcmd("{$pythonExecutable} {$pythonScript} \"{$userMessage}\"");
-
+        $command = "{$pythonExecutable} {$pythonScript} \"{$userMessage}\" 2>&1";
         $output = shell_exec($command);
+        dd($output);
 
         if ($output === null || $output === '') {
             return ['error' => 'Error executing Python script. No output returned.'];
@@ -200,92 +200,126 @@ class VisitorsCounterController extends Controller
     }
 
 
+//    public function respond(Request $request)
+//    {
+//        $text = $request->input('message');
+//
+//        // Send the text to the Python endpoint
+//        $response = Http::post('http://localhost:8080/analyze', [
+//            'text' => $text
+//        ]);
+//
+//        $analysis = json_decode($response->body(), true);
+//
+//        // Check for errors
+//        if (isset($analysis['error'])) {
+//            return response()->json(['message' => $analysis['error']]);
+//        }
+//
+//        // Extract entities and tokens
+//        $entities = $analysis['entities'] ?? [];
+//        $tokens = $analysis['tokens'] ?? [];
+//
+//        // Initialize variables
+//        $date = null;
+//        $gender = null;
+//        $specificDay = null;
+//        $month = null;
+//
+//        // Identify and parse entities
+//        foreach ($entities as $entity) {
+//            if ($entity[1] === 'DATE') {
+//                // If DATE entity is captured, assume it's the month or specific date
+//                $month = $this->mapMonth($entity[0]);
+//            } elseif ($entity[1] === 'GENDER') {
+//                $gender = $this->mapGender($entity[0]);
+//            }
+//        }
+//
+//        // Extract specific day if present in the text
+//        $specificDayMatch = preg_match('/(\d{1,2})/', $text, $matches);
+//        $specificDay = $specificDayMatch ? $matches[1] : null;
+//        $query = DB::table('counters');
+//
+//
+//
+//        // If a month was identified and a specific day is provided or not
+//        if ($month && $specificDay) {
+//            // Construct the full date with the specific day
+//            $date = date('Y-' . $month . '-' . str_pad($specificDay, 2, '0', STR_PAD_LEFT));
+//        } elseif ($month) {
+//            $startDate = $month ? date('Y-' . $month . '-01') : date('Y-m-01');
+//            $endDate = date("Y-m-t", strtotime($startDate));
+//
+//        }
+//
+//        if ($gender) {
+//
+//            $query->where('gender', $gender);
+//
+//            if ($specificDay) {
+//                // Specific date handling for gender
+//                $parsedDate = $date ?: date('Y-m-d'); // Convert date if parsed
+//                $gender_text = $this->mapGenderText($gender);
+//                dd($gender_text);
+//                return response()->json(['message' => "Total visits for {$gender} on {$parsedDate}: 0"]);
+//            } else {
+//                // General period handling for gender
+//                $parsedDate = $date ?: date('Y-m'); // Default to current month if not parsed
+//                $startDate = "$parsedDate-01";
+//                $endDate = date("Y-m-t", strtotime($startDate));
+//                return response()->json(['message' => "Total visits for {$gender} from {$startDate} to {$endDate}: 0"]);
+//            }
+//        }else{
+//            if ($specificDay) {
+//                // Specific date handling for gender
+//                $parsedDate = $date ?: date('Y-m-d'); // Convert date if parsed
+//                return response()->json(['message' => "Total visits  on {$parsedDate}: 0"]);
+//            } else {
+//                // General period handling for gender
+//                $parsedDate = $date ?: date('Y-m'); // Default to current month if not parsed
+//                $startDate = "$parsedDate-01";
+//                $endDate = date("Y-m-t", strtotime($startDate));
+//                return response()->json(['message' => "Total visits  from {$startDate} to {$endDate}: 0"]);
+//            }
+//        }
+//
+//        // Default response if no intent matches
+//        return response()->json(['message' => "I'm sorry, I didn't understand that."]);
+//    }
     public function respond(Request $request)
     {
-        $text = $request->input('message');
+        $input = $request->input('message');
 
-        // Send the text to the Python endpoint
-        $response = Http::post('http://localhost:8080/analyze', [
-            'text' => $text
-        ]);
+        $pythonScript = base_path('nlp/nlp/chatbot.py');
+        $pythonPath = 'C:\\Users\\yoga\\AppData\\Local\\Programs\\Python\\Python312\\python.exe';
 
-        $analysis = json_decode($response->body(), true);
+        $process = proc_open("\"$pythonPath\" \"$pythonScript\"", [
+            0 => ['pipe', 'r'], // STDIN
+            1 => ['pipe', 'w'], // STDOUT
+            2 => ['pipe', 'w']  // STDERR
+        ], $pipes);
 
-        // Check for errors
-        if (isset($analysis['error'])) {
-            return response()->json(['message' => $analysis['error']]);
-        }
+        if (is_resource($process)) {
+            fwrite($pipes[0], json_encode(['message' => $input]));
+            fclose($pipes[0]);
 
-        // Extract entities and tokens
-        $entities = $analysis['entities'] ?? [];
-        $tokens = $analysis['tokens'] ?? [];
+            $response = stream_get_contents($pipes[1]);
+            fclose($pipes[1]);
 
-        // Initialize variables
-        $date = null;
-        $gender = null;
-        $specificDay = null;
-        $month = null;
+            $error = stream_get_contents($pipes[2]);
+            fclose($pipes[2]);
 
-        // Identify and parse entities
-        foreach ($entities as $entity) {
-            if ($entity[1] === 'DATE') {
-                // If DATE entity is captured, assume it's the month or specific date
-                $month = $this->mapMonth($entity[0]);
-            } elseif ($entity[1] === 'GENDER') {
-                $gender = $this->mapGender($entity[0]);
+            proc_close($process);
+
+            if (!empty($error)) {
+                return response()->json(['reply' => 'There was an error: ' . $error]);
             }
+
+            return response()->json(json_decode($response));
         }
 
-        // Extract specific day if present in the text
-        $specificDayMatch = preg_match('/(\d{1,2})/', $text, $matches);
-        $specificDay = $specificDayMatch ? $matches[1] : null;
-        $query = DB::table('counters');
-
-
-
-        // If a month was identified and a specific day is provided or not
-        if ($month && $specificDay) {
-            // Construct the full date with the specific day
-            $date = date('Y-' . $month . '-' . str_pad($specificDay, 2, '0', STR_PAD_LEFT));
-        } elseif ($month) {
-            $startDate = $month ? date('Y-' . $month . '-01') : date('Y-m-01');
-            $endDate = date("Y-m-t", strtotime($startDate));
-
-        }
-
-        if ($gender) {
-
-            $query->where('gender', $gender);
-
-            if ($specificDay) {
-                // Specific date handling for gender
-                $parsedDate = $date ?: date('Y-m-d'); // Convert date if parsed
-                $gender_text = $this->mapGenderText($gender);
-                dd($gender_text);
-                return response()->json(['message' => "Total visits for {$gender} on {$parsedDate}: 0"]);
-            } else {
-                // General period handling for gender
-                $parsedDate = $date ?: date('Y-m'); // Default to current month if not parsed
-                $startDate = "$parsedDate-01";
-                $endDate = date("Y-m-t", strtotime($startDate));
-                return response()->json(['message' => "Total visits for {$gender} from {$startDate} to {$endDate}: 0"]);
-            }
-        }else{
-            if ($specificDay) {
-                // Specific date handling for gender
-                $parsedDate = $date ?: date('Y-m-d'); // Convert date if parsed
-                return response()->json(['message' => "Total visits  on {$parsedDate}: 0"]);
-            } else {
-                // General period handling for gender
-                $parsedDate = $date ?: date('Y-m'); // Default to current month if not parsed
-                $startDate = "$parsedDate-01";
-                $endDate = date("Y-m-t", strtotime($startDate));
-                return response()->json(['message' => "Total visits  from {$startDate} to {$endDate}: 0"]);
-            }
-        }
-
-        // Default response if no intent matches
-        return response()->json(['message' => "I'm sorry, I didn't understand that."]);
+        return response()->json(['reply' => 'Failed to initiate chat engine.']);
     }
 
     public function mapGender($genderStr)
@@ -478,7 +512,7 @@ public function getVisitorDataForChatbot(Request $request)
 
         $male = $request['maleCountInput'] ?? 0;
         $female = $request['femaleCountInput'] ?? 0;
-        $other = $request['otherCountInput'] ?? 0; 
+        $other = $request['otherCountInput'] ?? 0;
         if ($male > 0) {
             $counter = Counter::firstOrCreate(
                 [
@@ -488,7 +522,7 @@ public function getVisitorDataForChatbot(Request $request)
                 ],
                 ['counts' => 0]
             );
-            $counter->increment('counts', $male); 
+            $counter->increment('counts', $male);
         }
 
         if ($female > 0) {
@@ -512,7 +546,7 @@ public function getVisitorDataForChatbot(Request $request)
                 ],
                 ['counts' => 0]
             );
-            $counter->increment('counts', $other); 
+            $counter->increment('counts', $other);
         }
 
         if ($request->ajax()) {

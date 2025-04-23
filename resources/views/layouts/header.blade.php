@@ -137,7 +137,7 @@
             <ul class="list-inline mx-auto justify-content-center">
                 @if(Auth::check())
                     <li class='nav-item'>
-                        <a class='nav-link' target='_blank' href='{{ route('visitor_stats') }}'>Report</a>
+                        <a class='nav-link'  href='{{ route('visitor_stats') }}'>Report</a>
                     </li>
                     <li class='nav-item'>
                         <a class='nav-link' href='{{ route('news_leter') }}'>Newsletters</a>
