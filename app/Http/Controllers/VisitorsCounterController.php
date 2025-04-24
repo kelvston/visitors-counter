@@ -164,7 +164,6 @@ class VisitorsCounterController extends Controller
 
         $command = "{$pythonExecutable} {$pythonScript} \"{$userMessage}\" 2>&1";
         $output = shell_exec($command);
-        dd($output);
 
         if ($output === null || $output === '') {
             return ['error' => 'Error executing Python script. No output returned.'];
