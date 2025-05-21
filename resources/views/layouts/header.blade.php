@@ -18,6 +18,11 @@
       width: 100%;
     }
   </style>
+      <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+
+      <!-- html2canvas and jsPDF -->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 {{--    <link rel="stylesheet" href="{{ asset('css/ardhi/master.css') }}">--}}
     <!-- jQuery (necessary for DataTables) -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -144,6 +149,9 @@
                     </li>
                     <li class='nav-item'>
                         <a class='nav-link' href='{{ route('counter.report') }}'>Visitors</a>
+                    </li>
+                    <li class='nav-item'>
+                        <a class='nav-link' href='/barcode'>Barcode</a>
                     </li>
                     <li class='nav-item relative'>
                         <a class='nav-link'>{{ Auth::user()->name }}</a>

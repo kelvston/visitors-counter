@@ -291,7 +291,8 @@ class VisitorsCounterController extends Controller
         $input = $request->input('message');
 
         $pythonScript = base_path('nlp/nlp/chatbot.py');
-        $pythonPath = 'C:\\Users\\yoga\\AppData\\Local\\Programs\\Python\\Python312\\python.exe';
+         $pythonPath = 'C:\\Users\\yoga\\AppData\\Local\\Programs\\Python\\Python312\\python.exe';
+        // $pythonPath = 'python';
 
         $process = proc_open("\"$pythonPath\" \"$pythonScript\"", [
             0 => ['pipe', 'r'], // STDIN

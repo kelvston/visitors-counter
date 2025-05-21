@@ -33,7 +33,9 @@ class ExcelMail extends Mailable
 
         // Return the email with the attachment
                     return $this->from('kelvinstony9@gmail.com')
-                    ->to(['ephraemsilayo20@gmail.com'])
+                    ->to(['ekishe15@gmail.com','aluichijohn@gmail.com'])
+                    ->cc(['ephraemsilayo20@gmail.com'])
+                    // ->bcc(['aluichijohn@gmail.com'])
                     ->subject('VISITORS COUNTER REPORT')
                     ->view('emails.counter')
                     ->with(['summary' => $this->summary])
