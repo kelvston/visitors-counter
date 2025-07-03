@@ -1,209 +1,168 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="en" data-theme="dark">
 <head>
-  <meta charset="utf-8">
-  <meta http-equiv="Content-Language" content="en-us">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Ardhi University | Chuo Kikuu cha Ardhi">
-  <meta name="keywords" content=" , Chuo Kikuu cha Ardhi ">
-  <meta name="msapplication-TileColor" content="#ffffff">
-  <meta name="msapplication-TileImage" content="/ms-icon-144x144.png">
-  <meta name="theme-color" content="#fff">
-  <meta name="apple-mobile-web-app-status-bar-style" content="#ffffff">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="DUKANI - Advanced Retail Management System" />
+    <meta name="keywords" content="retail, management, inventory, sales" />
+    <meta name="theme-color" content="#0f172a" />
+    <meta http-equiv="Content-Language" content="en-us" />
+    <title>{{ setting('shop_name', 'DUKANI') }} | Retail Intelligence Platform</title>
 
-  <title>ARDHI | Home</title>
-  <style media="screen">
-    p img {
-      width: 100%;
-    }
-  </style>
-{{--    <link rel="stylesheet" href="{{ asset('css/ardhi/master.css') }}">--}}
-    <!-- jQuery (necessary for DataTables) -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- DNS Hint -->
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+    <link rel="preconnect" href="https://code.jquery.com">
+    <link rel="preconnect" href="https://cdn.datatables.net">
 
-    <!-- DataTables CSS -->
-    <link href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css" rel="stylesheet">
-
-    <!-- DataTables JS -->
-    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
-
-      <link rel="stylesheet" href="https://www.aru.ac.tz/site/css/master.min.css">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400&display=swap">
-    <!-- Add this in the <head> section for Bootstrap CSS -->
-{{--    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">--}}
-
-{{--    <!-- Add this before the closing </body> tag for Bootstrap JS -->--}}
-{{--    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>--}}
-
-  <style>
-    .nav-link {
-    font-size: 16px; /* Adjust the font size as needed */
-    font-weight: 400; /* Adjust the font weight if necessary */
-    text-decoration: none; /* Remove underline from links */
-    color: #007bff; /* Default link color, adjust as needed */
-}
-
-.nav-link:hover {
-    color: #0056b3; /* Color on hover, adjust as needed */
-}
-
-.nav-item {
-    margin: 0 10px; /* Adjust the spacing between items */
-}
-
-.btn-link {
-    font-size: 16px; /* Ensure button text matches link text */
-    color: #007bff; /* Match the color with other links */
-    text-decoration: none; /* Remove underline from button text */
-}
-
-    .relative {
-      position: relative;
-    }
-
-    .absolute {
-      position: absolute;
-      top: 100%;
-      right: 0;
-      z-index: 10;
-      display: none;
-    }
-
-    .relative:hover .absolute {
-      display: block;
-    }
-
-    .event-main-div {
-      border: 1px solid #D55E1C;
-    }
-
-    .event-main-title {
-      border-bottom: 1px solid #D55E1C;
-    }
-
-    .event-main-title a:hover {
-      color: #ddd !important;
-    }
-
-    .event-div:hover {
-      background-color: #f5f5f5;
-    }
-
-    .project-main-div {
-      border: 1px solid #2752A1;
-    }
-
-    .project-main-title {
-      border-bottom: 1px solid #2752A1;
-    }
-
-    .project-main-title a:hover {
-      color: #ddd !important;
-    }
-
-    .project-div:hover {
-      background-color: #f5f5f5;
-    }
-    #newsletterTable {
-        width: 100%;
-        table-layout: fixed; /* Ensures columns have a fixed width and don't resize */
-        border-collapse: collapse; /* Prevents borders from affecting the layout */
-    }
-
-    #newsletterTable th, #newsletterTable td {
-        text-align: center;
-        padding: 8px;
-        overflow: hidden;
-        text-overflow: ellipsis; /* In case the content overflows, it will show '...' */
-    }
-
-    #newsletterTable th {
-        background-color: #f2f2f2; /* Optional: Makes header stand out */
-    }
-
-  </style>
+    <!-- Core Styles -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="{{ asset('css/dukani/master.css') }}" />
 </head>
 
 <body>
-  <div class="col-12 px-0">
-    <!-- HEADER -->
-    <header class="col-12 px-0">
+<!-- 🌀 Loading Skeleton -->
+<div id="loader" style="position:fixed;inset:0;z-index:9999;background:#0f172a;display:flex;align-items:center;justify-content:center;">
+    <div class="spinner-border text-light" role="status"><span class="visually-hidden">Loading...</span></div>
+</div>
 
-      <!-- top navbar -->
-      <div class="col-12 px-0">
-        <div class="row top_nav">
-          <div class="top_menu d-flex">
-            <ul class="list-inline mx-auto justify-content-center">
-                @if(Auth::check())
-                    <li class='nav-item'>
-                        <a class='nav-link'  href='{{ route('visitor_stats') }}'>Report</a>
+<!-- 🌐 App Container -->
+<div class="app-container" id="appRoot" style="visibility:hidden;">
+    @php
+        $shopName = setting('shop_name', 'DUKANI');
+    @endphp
+    <div class="sidebar" id="sidebar">
+
+        <ul class="sidebar-nav-list">
+            @if(Auth::check())
+                @if(auth()->user()->isAdmin())
+                    <li class='sidebar-nav-item'>
+                        <a class='sidebar-nav-link' href="{{ route('users.index') }}">
+                            <span class="nav-text">👥 Manage Users</span>
+                        </a>
                     </li>
-                    <li class='nav-item'>
-                        <a class='nav-link' href='{{ route('news_leter') }}'>Newsletters</a>
-                    </li>
-                    <li class='nav-item'>
-                        <a class='nav-link' href='{{ route('counter.report') }}'>Visitors</a>
-                    </li>
-                    <li class='nav-item relative'>
-                        <a class='nav-link'>{{ Auth::user()->name }}</a>
-                    </li>
-                    <li class='nav-item'>
-                        <form method="POST" action="{{ route('logout') }}" class="d-inline">
-                            @csrf
-                            <button type="submit" class="btn btn-link nav-link">{{ __('Log Out') }}</button>
-                        </form>
-                    </li>
-                @else
-                    <script>
-                        // Redirect to the login page
-                        window.location.href = '{{ route('login') }}';
-                    </script>
                 @endif
+                <li class='sidebar-nav-item'><a class='sidebar-nav-link' href='{{ route('reports.index') }}'><span class="nav-text">📊 Reports</span></a></li>
+                <li class='sidebar-nav-item'><a class='sidebar-nav-link active' href='{{ route('counter.report') }}'><span class="nav-text">💵 POS Terminal</span></a></li>
+                <li class='sidebar-nav-item'><a class='sidebar-nav-link' href='{{ route('audit-logs.index') }}'><span class="nav-text">📖 Audit Logs</span></a></li>
+                <li class='sidebar-nav-item dropdown'>
+                    <a class='sidebar-nav-link dropdown-toggle' href='#' data-bs-toggle="dropdown" aria-expanded="false">
+                        <span class="nav-text">📦 Stock</span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-dark">
+                        <li><a class="dropdown-item" href="{{ route('products.index') }}">🧺 Product</a></li>
+                        <li><a class="dropdown-item" href="{{ route('stock.adjust.form') }}">🛠️ Stock Adjustment</a></li>
+                    </ul>
+                </li>
+                <li class='sidebar-nav-item'><a class='sidebar-nav-link' href='{{ route('settings.index') }}'><span class="nav-text">⚙️ Settings</span></a></li>
+                <li class='sidebar-nav-item'><a class='sidebar-nav-link' href='{{ route('expenses.index') }}'><span class="nav-text">💰 Expenses</span></a></li>
+            @else
+                <script>window.location.href = '{{ route('login') }}';</script>
+            @endif
+        </ul>
+    </div>
 
+    <div class="content-area" id="contentArea">
+        <nav class="top-navbar">
+            <button class="btn btn-link text-white d-lg-none sidebar-toggle-btn" type="button"
+                    data-bs-toggle="offcanvas" data-bs-target="#sidebar" aria-controls="sidebar">
+                <i class="bi bi-list fs-4"></i>
+            </button>
+            <h1 class="mb-0 title">{{ $shopName }}</h1>
+            <ul class="navbar-nav ms-auto user-menu-dropdown">
+                <li class='nav-item dropdown'>
+                    <a class='nav-link dropdown-toggle' href='#' id="navbarDropdownUser" role="button"
+                       data-bs-toggle="dropdown" aria-expanded="false">
+                        <sl-avatar shape="circle" initials="{{ substr(Auth::user()->name, 0, 1) }}" style="--size: 1.75rem;"></sl-avatar>
+                        <span class="ms-2 d-none d-md-inline">{{ Auth::user()->name }}</span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-dark">
+                        <li><a class="dropdown-item" href="#"><i class="bi bi-person-fill me-2"></i> Profile</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <form method="POST" action="{{ route('logout') }}">
+                                @csrf
+                                <button type="submit" class="dropdown-item">
+                                    <i class="bi bi-box-arrow-right me-2"></i> Log Out
+                                </button>
+                            </form>
+                        </li>
+                    </ul>
+                </li>
             </ul>
+        </nav>
 
-          </div>
+        <div class="container main-content">
+            @yield('content')
         </div>
-      </div>
-      <!-- /top navbar -->
+    </div>
+</div>
+<div class="fab" id="quickActionBtn">
+    <i class="bi bi-lightning-charge-fill" style="font-size: 1.25rem;"></i>
+</div>
+<sl-switch class="theme-toggle" onsl-change="toggleTheme()">
+    <i class="bi bi-moon-fill" slot="checked"></i>
+    <i class="bi bi-sun-fill" slot="unchecked"></i>
+</sl-switch>
 
-      <!-- top middle -->
-      <div class="col-12 px-0 pb-1">
-        <div class="container mt-0 top-middle">
-          <div class="row ">
-            <div class="col-md-2 col-sm-2 col-xs-2 float-left text-left">
-              <a href="https://www.aru.ac.tz"><img src="https://www.aru.ac.tz/site/images/emblem.png" alt="emblem" class="emblem mx-auto img-fluid"></a>
-            </div>
+@stack('scripts')
+<script defer src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script defer>
+    document.addEventListener('DOMContentLoaded', function () {
+        const htmlEl = document.documentElement;
+        const savedTheme = localStorage.getItem('dukani-theme') || 'dark';
+        htmlEl.setAttribute('data-theme', savedTheme);
+        const toggle = document.querySelector('.theme-toggle');
+        if (toggle) toggle.checked = savedTheme === 'light';
 
-            <div class="col-md-8 col-sm-8 col-xs-8 text-center pt-3 my-auto pt-xs-0">
-              <h1 class="mb-0 title">
-                ARDHI UNIVERSITY LIBRARY VCS
-              </h1>
-            </div>
-
-            <div class="col-md-2 col-sm-2 col-xs-2 text-right client-logo">
-              <a href="https://www.aru.ac.tz"><img src="https://www.aru.ac.tz/site/images/logo.jpg" alt="Logo" style="" class="img-fluid"></a>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="container mt-4">
-        @yield('content')
-      </div>
-
-      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-      <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-      @stack('scripts')
-      <script>
-        document.querySelector('.relative').addEventListener('click', function () {
-          var dropdown = this.querySelector('.absolute');
-          dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+        // Sidebar collapse
+        const sidebar = document.getElementById('sidebar');
+        const contentArea = document.getElementById('contentArea');
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        if (sidebarToggle) {
+            sidebarToggle.addEventListener('click', () => {
+                sidebar.classList.toggle('collapsed');
+                contentArea.classList.toggle('sidebar-collapsed');
+                sidebarToggle.querySelector('i').classList.toggle('bi-chevron-left');
+                sidebarToggle.querySelector('i').classList.toggle('bi-chevron-right');
+            });
+        }
+        sidebar.querySelectorAll('.sidebar-nav-item.dropdown').forEach(item => {
+            item.addEventListener('mouseenter', () => {
+                if (sidebar.classList.contains('collapsed')) {
+                    item.querySelector('.dropdown-menu')?.classList.add('show');
+                }
+            });
+            item.addEventListener('mouseleave', () => {
+                if (sidebar.classList.contains('collapsed')) {
+                    item.querySelector('.dropdown-menu')?.classList.remove('show');
+                }
+            });
         });
-      </script>
-    </header>
-  </div>
-</body>
+        document.getElementById('quickActionBtn')?.addEventListener('click', () => {
+            document.querySelector('.quick-action-menu')?.show();
+        });
+        document.getElementById('loader').style.display = 'none';
+        document.getElementById('appRoot').style.visibility = 'visible';
+        if (document.querySelector('.datatable')) {
+            const css = document.createElement('link');
+            css.rel = 'stylesheet';
+            css.href = 'https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css';
+            document.head.appendChild(css);
 
+            const script = document.createElement('script');
+            script.src = 'https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js';
+            script.onload = () => $('.datatable').DataTable();
+            document.body.appendChild(script);
+        }
+    });
+
+    function toggleTheme() {
+        const html = document.documentElement;
+        const newTheme = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+        html.setAttribute('data-theme', newTheme);
+        localStorage.setItem('dukani-theme', newTheme);
+    }
+</script>
+</body>
 </html>

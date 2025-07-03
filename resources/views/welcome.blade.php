@@ -165,7 +165,7 @@
             </form>
             <div class="form-group">
                 <p>Don't have an account? <a href="{{ route('register') }}" style="color: #007bff;">Register here</a></p>
-            </div>
+            </div>]
 
 
             <div class="footer">

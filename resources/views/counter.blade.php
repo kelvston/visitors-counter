@@ -1,710 +1,565 @@
 @extends('layouts.header')
 
 @section('content')
-<style>
-    /* Consolidated and updated CSS */
-   /* Consolidated and updated CSS */
-.logo {
-    text-align: center;
-    color: lightblue;
-}
-.emblem, .client-logo img {
-    max-height: 80px;
-    width: auto;
-}
-.title {
-    font-size: 2rem;
-    color: #007bff;
-    margin: 0;
-}
-.my-swal-popup {
-    border-radius: 15px;
-    padding: 20px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    background: linear-gradient(135deg, #f0f8ff, #e6e6e6);
-}
-.my-swal-title {
-    font-size: 1.5rem;
-    font-weight: bold;
-    color: #007bff;
-}
-.my-swal-text {
-    font-size: 1rem;
-    color: #333;
-    margin-top: 10px;
-}
-.my-swal-timer-progress {
-    height: 5px;
-    background: #007bff;
-}
-.swal2-backdrop {
-    background-color: rgba(0, 0, 0, 0.5);
-}
-.container {
-    padding: 10px;
-}
-.chat-box {
-    border: 1px solid #ccc;
-    padding: 20px;
-    border-radius: 8px;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    background-color: #fff;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-.chat-log {
-    height: 300px;
-    overflow-y: auto;
-    border-bottom: 1px solid #ccc;
-    margin-bottom: 10px;
-    padding-bottom: 10px;
-    background-color: #f9f9f9;
-}
-.chat-input-container {
-    display: flex;
-    padding: 10px;
-    border-top: 1px solid #ddd;
-    background-color: #fff;
-}
-.chat-input {
-    flex-grow: 1;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    margin-right: 10px;
-}
-.send-button {
-    padding: 10px 15px;
-    border: none;
-    border-radius: 4px;
-    background-color: #007bff;
-    color: #fff;
-    cursor: pointer;
-}
-.send-button:hover {
-    background-color: #0056b3;
-}
-.message-icon {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    background-color: #007bff;
-    color: white;
-    border-radius: 50%;
-    width: 50px;
-    height: 50px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-    font-size: 30px;
-}
-.modal-dialog.custom-size {
-    max-width: 400px;
-}
-.modal-backdrop.show {
-    opacity: 0.5;
-}
-.chart-container {
-    position: fixed;
-    bottom: 10px;
-    right: 10px;
-    width: 300px;
-    z-index: 1050;
-}
-.chart-container canvas {
-    width: 100% !important;
-}
-body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-    background-color: #f4f4f4;
-    position: relative;
-}
-.chat-container {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    width: 100%;
-    max-width: 400px;
-    background-color: #fff;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    display: flex;
-    flex-direction: column;
-    height: 400px;
-    z-index: 1050;
-}
-.message {
-    margin-bottom: 10px;
-}
-.user-message {
-    text-align: right;
-}
-.bot-message {
-    text-align: left;
-}
-.message-content {
-    display: inline-block;
-    padding: 10px;
-    border-radius: 8px;
-    max-width: 70%;
-    line-height: 1.4;
-}
-.user-message .message-content {
-    background-color: #007bff;
-    color: #fff;
-}
-.bot-message .message-content {
-    background-color: #f1f1f1;
-    color: #333;
-}
-    /* Custom styles for smaller decrement buttons */
-    .decrement-btn {
-        width: 20px;          /* Reduced width */
-        height: 20px;         /* Reduced height */
-        padding: 0;           /* No padding */
-        font-size: 14px;      /* Smaller font size */
-        line-height: 1;       /* Maintain single line height */
-        display: inline-flex;  /* Center the content */
-        align-items: center;   /* Center vertically */
-        justify-content: center; /* Center horizontally */
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2); /* Subtle shadow */
-        transition: background-color 0.3s ease, box-shadow 0.3s ease; /* Smooth transition */
-    }
-
-    .decrement-btn:hover {
-        background-color: #f8d7da; /* Light background on hover */
-        box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2); /* Shadow on hover */
-    }
-
-    .decrement-btn:active {
-        box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.2); /* Inset shadow when active */
-    }
-    /* Floating button */
-    .chat-toggle {
-        position: fixed;
-        bottom: 30px;
-        right: 30px;
-        background-color: #4caf50;
-        color: white;
-        border: none;
-        border-radius: 50%;
-        width: 60px;
-        height: 60px;
-        font-size: 30px;
-        cursor: pointer;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-    }
-
-    /* Chat container */
-    .chat-container {
-        position: fixed;
-        bottom: 100px;
-        right: 30px;
-        width: 350px;
-        max-height: 500px;
-        background: white;
-        border: 2px solid #a2e3a2;
-        border-radius: 15px;
-        display: none;
-        flex-direction: column;
-        box-shadow: 0 0 20px rgba(0,0,0,0.2);
-        animation: fadeIn 0.3s ease-in-out;
-    }
-
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(20px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-
-    .chat-box {
-        flex: 1;
-        padding: 15px;
-        overflow-y: auto;
-    }
-
-    .message {
-        margin: 10px 0;
-        max-width: 75%;
-        padding: 10px 15px;
-        border-radius: 20px;
-        line-height: 1.4;
-        font-size: 14px;
-    }
-
-    .user {
-        background-color: #d0ebff;
-        align-self: flex-end;
-        border-bottom-right-radius: 0;
-    }
-
-    .bot {
-        background-color: #e3fce4;
-        align-self: flex-start;
-        border-bottom-left-radius: 0;
-    }
-
-    .input-area {
-        display: flex;
-        border-top: 1px solid #ddd;
-        padding: 10px;
-    }
-
-    .input-area input {
-        flex: 1;
-        border: 1px solid #ccc;
-        padding: 10px;
-        border-radius: 10px;
-    }
-
-    .input-area button {
-        margin-left: 10px;
-        background: #4caf50;
-        color: white;
-        border: none;
-        padding: 10px 15px;
-        border-radius: 10px;
-        cursor: pointer;
-    }
-
-    .typing {
-        font-size: 13px;
-        font-style: italic;
-        color: #777;
-        margin-left: 10px;
-    }
-
-</style>
-@section('content')
-    <!-- Breadcrumb -->
-    <nav aria-label="breadcrumb">
+    <nav aria-label="breadcrumb" class=" px-3">
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{{ url()->previous() }}">Back</a></li>
-            <li class="breadcrumb-item active" aria-current="page">Visitor Summary</li>
         </ol>
     </nav>
-    <div class="row justify-content-center">
-        <!-- Summary Table -->
-        <div class="col-md-5 mb-2">
-            <div class="card shadow-sm">
-                <div class="card-header bg-primary text-white">
-                    <h2 class="text-center mb-0">Visitor Summary</h2>
-                </div>
-                <div class="card-body">
-                    <table class="table table-bordered table-sm text-center">
-                        <thead class="thead-light">
-                        <tr>
-                            <th>Period</th>
-                            <th>Male</th>
-                            <th>Female</th>
-                            <th>Other</th>
-                            <th>Total Visits</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        @foreach (['today'=>'Today','yesterday' => 'Yesterday', 'weekly' => 'This Week', 'monthly' => 'This Month', 'lastMonth' => 'Last Month', 'threeMonths' => 'Last Three Months', 'total' => 'TOTAL VISITS'] as $period => $label)
-                            <tr>
-                                <td>{{ $label }}</td>
-                                <td>{{ $summary[$period]['Male'] }}
-                                    @if ($period === 'today')
-                                        <button class="btn btn-sm btn-outline-danger rounded-circle ml-2 decrement-btn" onclick="decrementCount('male')">-</button>
-                                    @endif
-                                </td>
-                                <td>{{ $summary[$period]['Female'] }}
-                                    @if ($period === 'today')
-                                        <button class="btn btn-sm btn-outline-danger rounded-circle ml-2 decrement-btn" onclick="decrementCount('female')">-</button>
-                                    @endif
-                                </td>
-                                <td>{{ $summary[$period]['Other'] }}
-                                    @if ($period === 'today')
-                                        <button class="btn btn-sm btn-outline-danger rounded-circle ml-2 decrement-btn" onclick="decrementCount('other')">-</button>
-                                    @endif
-                                </td>
-                                <td>{{ $summary[$period]['totalVisits'] }}</td>
-                            </tr>
-                        @endforeach
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-3 mb-1">
-            <div class="card shadow-sm">
-                <div class="card-body text-center">
-                    <form id="incrementForm" action="{{ route('counter.increment') }}" method="POST" class="mb-3">
-                        @csrf
-                        <button type="button" class="btn btn-primary btn-lg btn-block" onclick="showGenderSelect()">Count</button>
-
-                        <div id="genderSelectContainer" style="display:none; margin-top:20px;">
-                            <label for="gender">Select Gender:</label>
-                            <select id="gender" name="gender" class="form-control">
-                                <option value="">Select</option>
-                                <option value="1">Male</option>
-                                <option value="2">Female</option>
-                                <option value="3">Other</option>
-                            </select>
-                            <button type="submit" class="btn btn-success mt-3">Submit</button>
+    <div class=" py-4 px-3 summary-card" >
+        <div class="row g-4" >
+            <div class="col-md-5">
+                <div class="card shadow-sm h-100 card-hover-effect">
+                    <div class="card-header bg-primary text-white py-3">
+                        <h2 class="text-center mb-0"><i class="bi bi-bar-chart-fill me-2"></i> Sales Summary</h2>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-sm text-center align-middle">
+                                <thead class="table-dark">
+                                <tr>
+                                    <th scope="col">Period</th>
+                                    <th scope="col">Items</th>
+                                    <th scope="col">Per Litre</th>
+                                    <th scope="col">Per Kg</th>
+                                    <th scope="col">Total Quantity</th>
+                                    <th scope="col">Total Price</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td><strong>Today</strong></td>
+                                    <td id="todayItems">0
+                                        <button class="btn btn-sm btn-outline-danger rounded-circle decrement-btn" onclick="decrementSale('item')">
+                                            <i class="bi bi-dash"></i>
+                                        </button>
+                                    </td>
+                                    <td id="todayLitre">0
+                                        <button class="btn btn-sm btn-outline-danger rounded-circle decrement-btn" onclick="decrementSale('litre')">
+                                            <i class="bi bi-dash"></i>
+                                        </button>
+                                    </td>
+                                    <td id="todayKg">0
+                                        <button class="btn btn-sm btn-outline-danger rounded-circle decrement-btn" onclick="decrementSale('kg')">
+                                            <i class="bi bi-dash"></i>
+                                        </button>
+                                    </td>
+                                    <td id="todayTotal"><strong>0</strong></td>
+                                    <td id="todayPrice"><strong>0</strong></td>
+                                </tr>
+                                </tbody>
+                            </table>
                         </div>
-                    </form>
-
-
-                    <div id="thankYouMessage" style="display:none; margin-top:20px;" class="alert alert-success">
-                        Thank you!
                     </div>
                 </div>
-                    <div class="card-body text-center" style="display:none;" id = "multiple">
-                        <form id="multiple" action="{{ route('counter.increment.multiple') }}" method="POST" class="mb-3">
-                                @csrf
+            </div>
 
-                                <div id="genderCounts" style="margin-top:20px;">
-                                <label for="maleCountInput">Male Count:</label>
-                                <input type="number" id="maleCountInput" name ="maleCountInput" class="form-control" >
-
-                                <label for="femaleCountInput" style="margin-top:10px;">Female Count:</label>
-                                <input type="number" id="femaleCountInput" name ="femaleCountInput" class="form-control" >
-
-                                <label for="otherCountInput" style="margin-top:10px;">Other Count:</label>
-                                <input type="number" id="otherCountInput" name ="otherCountInput" class="form-control" >
+            <div class="col-md-4">
+                <div class="card ">
+                    <div class="card-header bg-warning text-white">
+                        <h4 class="mb-0">Add New Sale</h4>
+                    </div>
+                    <div class="card-body">
+                        <form id="addSaleForm" method="POST" action="{{ route('products.store') }}"> {{-- Changed to sales.store --}}
+                            @csrf
+                            <div class="mb-3">
+                                <label class="form-label">Search Item:</label>
+                                <input type="text" id="productSearch" class="form-control mb-2" placeholder="Type to search..." autocomplete="off">
+                                <input type="hidden" id="selectedProductId">
+                                <div id="quantitySection" style="display: none;">
+                                    <label class="form-label">Quantity:</label>
+                                    <input type="text" value="1" id="productQuantity" class="form-control mb-2" placeholder="Qty (e.g., 1, 1/2, 0.25)">
+                                    <button type="button" class="btn btn-primary w-100 mb-2" id="addItemBtn">+ Add Item</button>
+                                    <small class="form-text text-muted">Click Add Item to insert</small>
                                 </div>
-                                <button type="submit" class="btn btn-success mt-3">Submit</button>
-                            </form>
-
+                                <div class="form-check mb-3">
+                                    <input class="form-check-input" type="checkbox" id="printReceipt" name="print_receipt" checked>
+                                    <label class="form-check-label" for="printReceipt">
+                                        Print Receipt
+                                    </label>
+                                </div>
                             </div>
+                            <div id="selectedItemsContainer" class="mb-3"></div>
+                            <button type="submit" class="btn btn-success w-100">
+                                <i class="bi bi-cart-plus-fill me-2"></i> Record Sale
+                            </button>
+                        </form>
                     </div>
                 </div>
-
-
-        <!-- Visitor Pie Chart -->
-        <div class="col-md-4 mb-1">
-            <div class="card shadow-sm">
-                <div class="card-header bg-primary text-white">
-                    <h2 class="text-center mb-0">Visitor Summary</h2>
-                </div>
-                <div class="card-body">
-                    <canvas id="visitorPieChart" width="300" height="300"></canvas>
+            </div>
+            <div class="col-md-3 card-hover-effect">
+                <div class="card shadow-sm h-100">
+                    <div class="card-header bg-info text-white">
+                        <h4 class="mb-0">Recent Sales</h4>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="table-responsive recent-sales-card">
+                            <table class="table table-sm text-center align-middle">
+                                <thead class="table-light">
+                                <tr>
+                                    <th scope="col">Item</th>
+                                    <th scope="col">Qty</th>
+                                    <th scope="col">Unit</th>
+                                    <th scope="col">Subtotal</th>
+                                </tr>
+                                </thead>
+                                <tbody id="recentSalesTable">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-{{--    <script src="https://cdn.pulse.is/livechat/loader.js" data-live-chat-id="67a5c56c81212f461c081862" async></script>--}}
- <!-- Modal Trigger -->
-<!-- Modal Trigger -->
-{{--<div class="message-icon" data-toggle="modal" id="message-icon" data-target="#chatModal">💬</div>--}}
-{{--<!-- Modal -->--}}
-{{--<div class="modal fade" id="chatModal" tabindex="-1" role="dialog" aria-labelledby="chatModalLabel" aria-hidden="true">--}}
-{{--    <div class="modal-dialog modal-sm custom-size" role="document"> <!-- Added modal-sm and custom-size classes -->--}}
-{{--        <div class="modal-content">--}}
-{{--            <div class="modal-header">--}}
-{{--                <h5 class="modal-title" id="chatModalLabel">Chatbot</h5>--}}
-{{--                <button type="button" class="close" data-dismiss="modal" aria-label="Close">--}}
-{{--                    <span aria-hidden="true">&times;</span>--}}
-{{--                </button>--}}
-{{--            </div>--}}
-{{--            <div class="modal-body">--}}
 
-{{--                    <div class="chat-box">--}}
-{{--                        <div class="chat-log" id="chat-log"></div>--}}
-{{--                        <meta name="csrf-token" content="{{ csrf_token() }}">--}}
-{{--                        <div class="chat-input-container">--}}
-{{--                            <input type="text" id="chat-input" class="chat-input" placeholder="Type a message...">--}}
-{{--                            <button class="send-button" onclick="sendMessage()">Send</button>--}}
-{{--                        </div>--}}
-{{--                    </div>--}}
-{{--                </div>--}}
-{{--            </div>--}}
-{{--        </div>--}}
-{{--    </div>--}}
-
-{{--    <form onsubmit="sendMessage(); return false;">--}}
-{{--        <input type="text" id="user-input" placeholder="Ask me something..." />--}}
-{{--        <button type="submit">Send</button>--}}
-{{--    </form>--}}
-    <!-- Toggle button -->
-    <button class="chat-toggle" onclick="toggleChat()">💬</button>
-
-    <!-- Chat UI -->
-    <div class="chat-container" id="chat-container">
-        <div class="chat-box" id="chat-box">
-            <div class="message bot">Hi! I'm your library assistant. How can I help you today?</div>
+    <template id="selectedItemRowTemplate">
+        <div class="selected-item-row">
+            <input type="hidden" class="product_id">
+            <span class="item_name">Item Name</span>
+            <input type="text" class="form-control quantity mx-2" placeholder="Qty (e.g., 1, 1/2, 0.25)">
+            <div class="btn-group">
+                <button type="button" class="btn btn-outline-danger decrement-btn">−</button>
+                <button type="button" class="btn btn-outline-success increment-btn">+</button>
+            </div>
+            <button type="button" class="btn btn-outline-secondary ms-3 remove-btn">
+                <i class="bi bi-x-circle"></i>
+            </button>
         </div>
-        <div class="typing" id="typing" style="display:none;">Bot is typing...</div>
-        <div class="input-area">
-            <input type="text" id="user-input" placeholder="Type your question...">
-            <button onclick="sendMessage()">Send</button>
-        </div>
-    </div>
+    </template>
+
+    {{-- NEW TEMPLATE FOR RECENT SALES ROWS --}}
+    <template id="recentSaleRowTemplate">
+        <tr>
+            <td class="recent-item-name"></td>
+            <td class="recent-quantity"></td>
+            <td class="recent-unit-type"></td>
+            <td class="recent-subtotal"></td>
+            <td class="recent-date"></td>
+        </tr>
+    </template>
 
 @endsection
 
-
 @push('scripts')
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script>
-    function toggleChat() {
-        const chat = document.getElementById("chat-container");
-        const input = document.getElementById("user-input");
-        chat.style.display = chat.style.display === "flex" ? "none" : "flex";
-        setTimeout(() => input.focus(), 100); // Auto-focus after animation
-    }
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> {{-- Make sure Chart.js is included if you use it --}}
 
-    function appendMessage(message, sender) {
-        const box = document.getElementById('chat-box');
-        const div = document.createElement('div');
-        div.className = 'message ' + sender;
-        div.textContent = message;
-        box.appendChild(div);
-        box.scrollTop = box.scrollHeight;
-    }
-
-    function sendMessage() {
-        const input = document.getElementById('user-input');
-        const message = input.value.trim();
-        if (!message) return;
-
-        appendMessage(message, 'user');
-        input.value = '';
-        showTyping(true);
-
-        fetch('/chatbot', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': '{{ csrf_token() }}'
-            },
-            body: JSON.stringify({ message: message })
-        })
-            .then(res => res.json())
-            .then(data => {
-                showTyping(false);
-                appendMessage(data.reply, 'bot');
-            })
-            .catch(() => {
-                showTyping(false);
-                appendMessage('Sorry, something went wrong.', 'bot');
-            });
-    }
-
-    function showTyping(show) {
-        document.getElementById('typing').style.display = show ? 'block' : 'none';
-    }
-
-
-    document.addEventListener('DOMContentLoaded', function () {
-        const pieChartData = {
-            labels: ['Male', 'Female', 'Other'],
-            datasets: [{
-                label: 'Visitors by Gender',
-                data: [{{$summary['today']['Male']}}, {{$summary['today']['Female']}}, {{$summary['today']['Other']}}],
-                backgroundColor: ['#007bff', '#ff0077', '#00cc99'],
-            }]
-        };
-
-        const ctxPie = document.getElementById('visitorPieChart');
-        new Chart(ctxPie, {
-            type: 'pie',
-            data: pieChartData,
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-            }
-        });
-    });
-
-    let isSubmitting = false;
-
-    document.addEventListener('DOMContentLoaded', function () {
-        document.addEventListener('keypress', function (event) {
-            if (event.key === 'Enter' && document.getElementById('genderSelectContainer').style.display === 'none') {
-                event.preventDefault();
-                showGenderSelect();
-            } else if (event.key === 'Enter' && document.getElementById('genderSelectContainer').style.display !== 'none') {
-                event.preventDefault();
-                submitForm();
-            }
-
-            if (event.shiftKey && document.getElementById('multiple').style.display === 'none') {
-            event.preventDefault();
-            showMultiple();
-             }
-                });
-
-                document.addEventListener('keydown', function(event) {
-            if (event.shiftKey && document.getElementById('multiple').style.display === 'none') {
-                event.preventDefault();
-                showMultiple();
-                submitForm();
-            }
-        });
-
-
-
-        document.addEventListener('keydown', function (event) {
-            if (document.getElementById('genderSelectContainer').style.display !== 'none') {
-                let genderSelect = document.getElementById('gender');
-                if (event.key === 'ArrowDown') {
-                    event.preventDefault();
-                    genderSelect.selectedIndex = (genderSelect.selectedIndex + 1) % genderSelect.options.length;
-                } else if (event.key === 'ArrowUp') {
-                    event.preventDefault();
-                    genderSelect.selectedIndex = (genderSelect.selectedIndex - 1 + genderSelect.options.length) % genderSelect.options.length;
+    <script>
+        // Parse fraction or decimal string to float number
+        function parseFraction(input) {
+            input = input.trim();
+            if (!input) return 0;
+            if (input.includes('/')) {
+                let parts = input.split('/');
+                if (parts.length === 2) {
+                    let numerator = parseFloat(parts[0]);
+                    let denominator = parseFloat(parts[1]);
+                    if (!isNaN(numerator) && !isNaN(denominator) && denominator !== 0) {
+                        return numerator / denominator;
+                    }
                 }
+                return 0;
             }
-        });
-    });
-    // $('#message-icon').on('click', function() {
-    //         $('#chatModal').modal('show');
-    //     });
-    $(document).ready(function() {
-        $('#message-icon').on('click', function() {
-            $('#chatModal').modal('show');
-        });
-    });
-//     function sendMessage() {
-//     var messageInput = document.getElementById('chat-input');
-//     var message = messageInput.value.trim();
-//
-//     if (message === '') {
-//         alert('Please enter a message.');
-//         return;
-//     }
-//
-//     $.ajax({
-//         url: '/chatbot',
-//         method: 'POST',
-//         data: {
-//             message: message,
-//             _token: document.querySelector('meta[name="csrf-token"]').getAttribute('content') // CSRF token
-//         },
-//         success: function(response) {
-//             var chatLog = document.getElementById('chat-log');
-//
-//             // User Message
-//             var userMessageElement = document.createElement('div');
-//             userMessageElement.classList.add('user-message');
-//             userMessageElement.innerHTML = `<div class="message-content">You: ${message}</div>`;
-//             chatLog.appendChild(userMessageElement);
-//
-//             // Bot Response
-//             var responseMessageElement = document.createElement('div');
-//             responseMessageElement.classList.add('bot-message');
-//             responseMessageElement.innerHTML = `<div class="message-content">Bot: ${response.totalVisits !== undefined ? 'Total Visits: ' + response.totalVisits : response.message}</div>`;
-//             chatLog.appendChild(responseMessageElement);
-//
-//             messageInput.value = '';
-//             chatLog.scrollTop = chatLog.scrollHeight; // Scroll to bottom
-//
-//             console.log('Message sent:', response);
-//         },
-//         error: function(xhr, status, error) {
-//             console.error('Error sending message:', error);
-//         }
-//     });
-// }
+            let val = parseFloat(input);
+            return isNaN(val) ? 0 : val;
+        }
 
+        // Format quantity decimal as string with max 2 decimals
+        function formatQuantity(qty) {
+            return qty % 1 === 0 ? qty.toString() : qty.toFixed(2);
+        }
 
-    function showGenderSelect() {
-        document.getElementById('genderSelectContainer').style.display = 'block';
-        document.getElementById('gender').focus();
-    }
+        $(document).ready(function() {
+            let itemCount = 0;
+            let selectedProduct = null;
+            const selectedItems = new Set(); // To keep track of unique product_ids in the current sale
 
-    function showMultiple() {
-        document.getElementById('multiple').style.display = 'block';
-        document.getElementById('gender').focus();
-    }
-
-
-    function submitForm() {
-        if (isSubmitting) return;
-        isSubmitting = true;
-
-        const form = document.getElementById('incrementForm');
-        const formData = new FormData(form);
-
-        fetch(form.action, {
-            method: form.method,
-            body: formData,
-            headers: {
-                'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value,
-                'X-Requested-With': 'XMLHttpRequest'
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                Swal.fire({
-    icon: 'success',
-    title: 'Thank you!',
-    text: 'Your action has been successfully recorded.',
-    showConfirmButton: false,
-    timer: 2000,
-    timerProgressBar: true,
-    position: 'center',
-    backdrop: true,
-    customClass: {
-        container: 'my-swal-container',
-        title: 'my-swal-title',
-        text: 'my-swal-text',
-        popup: 'my-swal-popup',
-        timerProgressBar: 'my-swal-timer-progress'
-    },
-    didOpen: () => {
-        // Additional setup if needed
-    }
-}).then(() => {
-            window.location.reload(); // Refresh the page after the alert
-        });
-        document.getElementById('genderSelectContainer').style.display = 'none';
-        form.reset();
-    }
-})
-
-        .catch(error => {
-            console.error('Error:', error);
-        })
-        .finally(() => {
-            isSubmitting = false;
-        });
-    }
-
-    function decrementCount(gender) {
-        $.ajax({
-            url: '{{ route('counter.decrement') }}',
-            type: 'POST',
-            data: {
-                gender: gender,
-                _token: '{{ csrf_token() }}'
-            },
-            success: function(response) {
-                if (response.success) {
-                    Swal.fire({
-                        title: 'Success',
-                        text: response.message,
-                        icon: 'success',
-                        timer: 1500,
-                        showConfirmButton: false
+            // Autocomplete Search
+            $('#productSearch').autocomplete({
+                minLength: 1,
+                source: function(request, response) {
+                    $.ajax({
+                        url: "{{ route('products.autocomplete') }}",
+                        dataType: "json",
+                        data: { term: request.term },
+                        success: function(data) {
+                            response(data);
+                        }
                     });
-                    // Reload or update the table data here, if necessary.
-                    location.reload();  // Refresh the page to show the updated count
+                },
+                select: function(event, ui) {
+                    selectedProduct = ui.item;
+                    $('#selectedProductId').val(ui.item.id);
+                    $('#quantitySection').show();
+                    return false;
                 }
-            },
-            error: function() {
-                Swal.fire({
-                    title: 'Error',
-                    text: 'Could not decrement the count.',
-                    icon: 'error'
+            });
+
+            // Hide quantity section if input cleared
+            $('#productSearch').on('input', function() {
+                if (!$(this).val()) {
+                    $('#quantitySection').hide();
+                    selectedProduct = null;
+                    $('#selectedProductId').val('');
+                }
+            });
+
+            // Add Item Button
+            $('#addItemBtn').on('click', function () {
+                const productId = $('#selectedProductId').val();
+                const quantityStr = $('#productQuantity').val().trim();
+                const quantity = parseFraction(quantityStr);
+
+                if (!productId || !selectedProduct) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'No product selected',
+                        text: 'Please select a valid product from the list.'
+                    });
+                    return;
+                }
+
+                if (selectedItems.has(productId)) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Duplicate product',
+                        text: 'This product has already been added to the list. Adjust quantity or remove it first.'
+                    });
+                    return;
+                }
+
+                if (!quantity || quantity <= 0) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Invalid quantity',
+                        text: 'Please enter a valid positive quantity (e.g., 1, 1/2, 0.25).'
+                    });
+                    return;
+                }
+                const template = $('#selectedItemRowTemplate').html();
+                const $itemRow = $(template);
+                $itemRow.find('.product_id').val(productId);
+                $itemRow.find('.product_id').attr('name', `items[${itemCount}][product_id]`); // Set name for form submission
+                $itemRow.find('.item_name').text(selectedProduct.value);
+                $itemRow.find('.quantity').val(formatQuantity(quantity));
+                $itemRow.find('.quantity').attr('name', `items[${itemCount}][quantity]`); // Set name for form submission
+                $itemRow.find('.increment-btn').click(() => {
+                    let qty = parseFraction($itemRow.find('.quantity').val());
+                    qty += 0.25; // Increment by 0.25
+                    $itemRow.find('.quantity').val(formatQuantity(qty));
+                });
+
+                $itemRow.find('.decrement-btn').click(() => {
+                    let qty = parseFraction($itemRow.find('.quantity').val());
+                    if (qty > 0.25) { // Ensure quantity doesn't go below 0.25 for positive value
+                        qty -= 0.25; // Decrement by 0.25
+                        $itemRow.find('.quantity').val(formatQuantity(qty));
+                    } else if (qty > 0 && qty <= 0.25) { // If it's already small, set to 0 to allow removal
+                        $itemRow.find('.quantity').val(0);
+                    }
+                });
+
+                $itemRow.find('.remove-btn').click(() => {
+                    $itemRow.remove();
+                    selectedItems.delete(productId); // Remove from tracking set
+                });
+
+                $('#selectedItemsContainer').append($itemRow);
+                selectedItems.add(productId); // Add to tracking set
+                itemCount++; // Increment for unique indexing
+
+                // Clear input fields for next item
+                $('#productSearch').val('');
+                $('#productQuantity').val('1');
+                $('#selectedProductId').val('');
+                $('#quantitySection').hide();
+                selectedProduct = null;
+            });
+
+            // Submit form via AJAX with SweetAlert feedback
+            function b64toBlob(b64Data, contentType='', sliceSize=512) {
+                const byteCharacters = atob(b64Data);
+                const byteArrays = [];
+
+                for (let offset = 0; offset < byteCharacters.length; offset += sliceSize) {
+                    const slice = byteCharacters.slice(offset, offset + sliceSize);
+
+                    const byteNumbers = new Array(slice.length);
+                    for (let i = 0; i < slice.length; i++) {
+                        byteNumbers[i] = slice.charCodeAt(i);
+                    }
+
+                    const byteArray = new Uint8Array(byteNumbers);
+
+                    byteArrays.push(byteArray);
+                }
+
+                return new Blob(byteArrays, {type: contentType});
+            }
+
+
+            $('#addSaleForm').on('submit', function(e) {
+                e.preventDefault();
+
+                let itemsData = [];
+                let isValid = true;
+
+                // Loop through all selected items in the container
+                $('#selectedItemsContainer .selected-item-row').each(function() {
+                    const productId = $(this).find('.product_id').val();
+                    const quantityStr = $(this).find('.quantity').val().trim();
+                    const quantity = parseFraction(quantityStr);
+
+                    if (!productId) {
+                        Swal.fire('Validation Error', 'A selected item is missing a product ID. Please re-add or clear.', 'error');
+                        isValid = false;
+                        return false; // Break .each loop
+                    }
+                    if (quantity <= 0 || isNaN(quantity)) {
+                        Swal.fire('Validation Error', `Quantity for '${$(this).find('.item_name').text()}' must be a positive number.`, 'error');
+                        isValid = false;
+                        return false; // Break .each loop
+                    }
+                    itemsData.push({
+                        product_id: productId,
+                        quantity: quantity
+                    });
+                });
+
+                // If no items were added via the "Add Item" button, check the main fields
+                if (itemsData.length === 0) {
+                    const singleProductId = $('#selectedProductId').val();
+                    const quantityStr = $('#productQuantity').val().trim();
+                    const quantity = parseFraction(quantityStr);
+
+                    if (!singleProductId) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'No products added',
+                            text: 'Please select and add at least one product to the sale.'
+                        });
+                        return;
+                    }
+
+                    if (quantity <= 0 || isNaN(quantity)) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Invalid quantity',
+                            text: 'Please enter a valid positive quantity for the single item.'
+                        });
+                        return;
+                    }
+
+                    itemsData.push({
+                        product_id: singleProductId,
+                        quantity: quantity
+                    });
+                }
+
+                if (!isValid) {
+                    return; // Stop submission if previous validation failed
+                }
+
+                const submitButton = $(this).find('button[type="submit"]');
+                submitButton.prop('disabled', true).html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Recording...');
+                const print_receipt = $('#printReceipt').is(':checked') ? 1 : 0;
+
+                $.ajax({
+                    url: $(this).attr('action'),
+                    method: 'POST',
+                    data: {
+                        _token: '{{ csrf_token() }}',
+                        print_receipt,
+                        items: itemsData // Send as 'items' array
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Success',
+                                text: response.message,
+                                timer: 2000,
+                                showConfirmButton: false,
+                                customClass: {
+                                    popup: 'my-swal-popup',
+                                    title: 'my-swal-title',
+                                    htmlContainer: 'my-swal-text',
+                                    timerProgressBar: 'my-swal-timer-progress'
+                                },
+                                didOpen: (toast) => {
+                                    toast.addEventListener('mouseenter', Swal.stopTimer);
+                                    toast.addEventListener('mouseleave', Swal.resumeTimer);
+                                }
+                            }).then(() => {
+
+                                $('#selectedItemsContainer').empty(); // Clear all added items
+                                $('#productSearch').val('');
+                                $('#productQuantity').val('1');
+                                $('#selectedProductId').val('');
+                                $('#quantitySection').hide();
+                                selectedProduct = null;
+                                selectedItems.clear(); // Clear tracking set
+                                itemCount = 0; // Reset item counter
+
+                                submitButton.prop('disabled', false).html('<i class="bi bi-cart-plus-fill me-2"></i> Record Sale');
+// If receipt PDF returned, open it in a new tab
+                                if (response.receipt_pdf) {
+                                    const pdfData = response.receipt_pdf;
+                                    const blob = b64toBlob(pdfData, 'application/pdf');
+                                    const blobUrl = URL.createObjectURL(blob);
+                                    window.open(blobUrl, '_blank');
+                                }
+                                fetchSalesSummary(); // Refresh summary after recording sale
+                                fetchRecentSales(); // Refresh recent sales after recording sale
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: response.message || 'Failed to record sale.',
+                            });
+                            submitButton.prop('disabled', false).html('<i class="bi bi-cart-plus-fill me-2"></i> Record Sale');
+                        }
+                    },
+                    error: function(xhr) {
+                        let errorText = 'An error occurred.';
+                        if (xhr.responseJSON && xhr.responseJSON.message) {
+                            if (xhr.responseJSON.errors) {
+                                let errors = Object.values(xhr.responseJSON.errors).flat().join('<br>');
+                                errorText = `Validation Errors:<br>${errors}`;
+                            } else {
+                                errorText = xhr.responseJSON.message;
+                            }
+                        } else if (xhr.statusText) {
+                            errorText = xhr.statusText;
+                        }
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            html: errorText, // Use html for multiline errors
+                        });
+                        submitButton.prop('disabled', false).html('<i class="bi bi-cart-plus-fill me-2"></i> Record Sale');
+                    }
+                });
+            });
+
+            // Function to fetch and update sales summary table and quick summary
+            function fetchSalesSummary() {
+                fetch("{{ route('sales.summary') }}")
+                    .then(response => {
+                        if (!response.ok) {
+                            return response.json().then(errorData => {
+                                console.error('Error loading sales summary:', errorData.message || 'Unknown error');
+                                throw new Error('Network response was not ok');
+                            });
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        document.getElementById('todayItems').innerHTML = data.today.items + `<button class="btn btn-sm btn-outline-danger rounded-circle decrement-btn" onclick="decrementSale('item')"><i class="bi bi-dash"></i></button>`;
+                        document.getElementById('todayLitre').innerHTML = data.today.litre + `<button class="btn btn-sm btn-outline-danger rounded-circle decrement-btn" onclick="decrementSale('litre')"><i class="bi bi-dash"></i></button>`;
+                        document.getElementById('todayKg').innerHTML = data.today.kg + `<button class="btn btn-sm btn-outline-danger rounded-circle decrement-btn" onclick="decrementSale('kg')"><i class="bi bi-dash"></i></button>`;
+                        document.getElementById('todayTotal').textContent = data.today.total_quantity;
+                        document.getElementById('todayPrice').textContent = data.today.total_revenue;
+
+                        document.getElementById('totalSalesItems').textContent = data.total_sales.items;
+                        document.getElementById('totalSalesLitre').textContent = data.total_sales.litre;
+                        document.getElementById('totalSalesKg').textContent = data.total_sales.kg;
+                        document.getElementById('totalSalesTotal').textContent = data.total_sales.total_quantity;
+                        document.getElementById('totalSalesPrice').textContent = data.total_sales.total_revenue;
+
+                        // Update quick summary
+                        $('#summaryTotalSales').text(data.total_sales.total_revenue);
+                        $('#summaryTopItem').text(data.top_item?.name || 'N/A');
+                        $('#summaryAvgDaily').text(data.avg_daily_sales ? data.avg_daily_sales.toFixed(2) : '0');
+                    })
+                    .catch(error => {
+                        console.error('Error fetching sales summary:', error);
+                    });
+            }
+
+            // Function to fetch and update recent sales table
+            function fetchRecentSales() {
+                fetch("{{ route('sales.recent') }}")
+                    .then(response => {
+                        if (!response.ok) {
+                            return response.json().then(errorData => {
+                                console.error('Error loading recent sales:', errorData.message || 'Unknown error');
+                                throw new Error('Network response was not ok');
+                            });
+                        }
+                        return response.json();
+                    })
+                    .then(response => {
+                        if (response.success) {
+                            const $tbody = $('#recentSalesTable');
+                            $tbody.empty(); // Clear existing rows
+                            if (response.data.length === 0) {
+                                $tbody.append('<tr><td colspan="5">No recent sales</td></tr>');
+                                return;
+                            }
+                            response.data.forEach(item => {
+                                const $row = $($('#recentSaleRowTemplate').html()); // Use the new template
+                                $row.find('.recent-item-name').text(item.name);
+                                $row.find('.recent-quantity').text(item.quantity);
+                                $row.find('.recent-unit-type').text(item.unit_type);
+                                $row.find('.recent-subtotal').text(item.subtotal);
+                                $tbody.append($row);
+                            });
+                        } else {
+                            console.error('Failed to load recent sales:', response.message);
+                            $('#recentSalesTable').html('<tr><td colspan="5">Error loading recent sales</td></tr>');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error fetching recent sales:', error);
+                        $('#recentSalesTable').html('<tr><td colspan="5">Error loading recent sales</td></tr>');
+                    });
+            }
+
+            // Initial fetches on page load
+            fetchSalesSummary();
+            fetchRecentSales(); // Call this to populate recent sales on load
+
+            // The decrementSale function (assuming it's in SalesController)
+            function decrementSale(type) {
+                $.ajax({
+                    url: "{{ route('sales.decrement') }}",
+                    method: 'POST',
+                    data: {
+                        _token: '{{ csrf_token() }}',
+                        type: type
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Decremented!',
+                                text: response.message || 'Sale decremented successfully.',
+                                timer: 1500,
+                                showConfirmButton: false
+                            }).then(() => {
+                                fetchSalesSummary(); // Refresh summary after decrement
+                                fetchRecentSales(); // Refresh recent sales after decrement
+                            });
+                        } else {
+                            Swal.fire('Error', response.message || 'Failed to decrement sale.', 'error');
+                        }
+                    },
+                    error: function(xhr) {
+                        let errorMessage = 'An error occurred during decrement.';
+                        if (xhr.responseJSON && xhr.responseJSON.message) {
+                            errorMessage = xhr.responseJSON.message;
+                        }
+                        Swal.fire('Error', errorMessage, 'error');
+                    }
                 });
             }
         });
-    }
-
-
-</script>
+    </script>
 @endpush
+
