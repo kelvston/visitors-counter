@@ -14,6 +14,9 @@ Route::get('/barcode', function () {
     return view('barcode');
 });
 
+
+
+
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
@@ -23,7 +26,7 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
-Route::get('/report', [VisitorsCounterController::class, 'show'])->name('counter.report');
+Route::get('/reports', [VisitorsCounterController::class, 'show'])->name('counter.report');
 Route::post('/report', [VisitorsCounterController::class, 'increment'])->name('counter.increment');
 Route::post('/multiple', [VisitorsCounterController::class, 'incrementMultiple'])->name('counter.increment.multiple');
 Route::get('/chatbot', [VisitorsCounterController::class, 'index']);
@@ -38,7 +41,12 @@ Route::get('/visitor_stats', [reportController::class, 'index'])->name('visitor_
 Route::get('/news_leter', [NewsLetterController::class, 'index'])->name('news_leter');
 Route::post('/news_leter_store', [NewsLetterController::class, 'store'])->name('news_leter.store');
 Route::get('/data', [reportController::class, 'getData'])->name('report.data');
-
+// routes/web.php
+Route::get('/proposals/create', [reportController::class, 'createProposal'])->name('proposals.create');
+Route::post('/proposals/store', [reportController::class, 'storeProposal'])->name('proposals.store');
+Route::get('/proposal', [reportController::class, 'indexProposal'])->name('proposal');
+// routes/web.php
+Route::get('/proposals/search', [reportController::class, 'search'])->name('proposals.search');
 
 
 Route::get('/test-script-path', function () {

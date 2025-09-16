@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Counter;
+use App\Models\Proposal;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -12,6 +13,73 @@ class reportController extends Controller
     /**
      * Display a listing of the resource.
      */
+    public function search(Request $request)
+    {
+        $query = Proposal::query();
+
+        if ($request->filled('search')) {
+            $search = strtolower($request->search);
+            $query->whereRaw('LOWER(title) LIKE ?', ["%{$search}%"]);
+        }
+
+        if ($request->filled('from')) {
+            $query->whereDate('timeline', '>=', $request->from);
+        }
+
+        if ($request->filled('to')) {
+            $query->whereDate('timeline', '<=', $request->to);
+        }
+
+
+        $proposals = $query->latest()->paginate(10)->withQueryString();
+
+
+        return view('proposals.partials.table', compact('proposals'));
+    }
+
+    public function createProposal()
+    {
+        return view('proposals.create');
+    }
+
+    public function storeProposal(Request $request)
+    {
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'timeline' => 'required|string|max:255',
+            'details' => 'required|string',
+            'attachment' => 'required|mimes:pdf|max:5048', // only PDF, max 2MB
+        ]);
+
+        $filePath = $request->file('attachment')->store('proposals', 'public');
+       Proposal::create([
+            'title' => $request->title,
+            'timeline' => $request->timeline,
+            'details' => $request->details,
+            'attachment' => $filePath,
+        ]);
+
+
+        return redirect()->route('proposal')->with('success', 'Proposal submitted successfully!');
+    }
+    public function indexProposal(Request $request)
+    {
+        $query = Proposal::query();
+
+        if ($request->filled('search')) {
+            $query->where('title', 'like', '%' . $request->search . '%');
+        }
+
+        // Filter by date range
+        if ($request->filled('from') && $request->filled('to')) {
+            $query->whereBetween('created_at', [$request->from, $request->to]);
+        }
+
+        $proposals = $query->latest()->paginate(10)->withQueryString();
+
+        return view('proposal', compact('proposals'));
+    }
+
     public function index()
     {
         $data = DB::table('counters')

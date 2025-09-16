@@ -153,6 +153,9 @@
                     <li class='nav-item'>
                         <a class='nav-link' href='/barcode'>Barcode</a>
                     </li>
+                <li class='nav-item'>
+                    <a class='nav-link' href="/proposal">Proposal</a>
+                </li>
                     <li class='nav-item relative'>
                         <a class='nav-link'>{{ Auth::user()->name }}</a>
                     </li>

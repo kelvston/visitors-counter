@@ -429,6 +429,7 @@ class VisitorsCounterController extends Controller
 
 public function index()
 {
+    dd(11);
     return view('chatbot.index');
 }
 
