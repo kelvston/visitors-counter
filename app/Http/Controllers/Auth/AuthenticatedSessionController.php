@@ -30,7 +30,7 @@ class AuthenticatedSessionController extends Controller
 
 
         // return redirect()->intended(route('dashboard', absolute: false));
-        return redirect()->intended(route('counter.report', absolute: false));
+        return redirect()->route('counter.report');
     }
 
     /**

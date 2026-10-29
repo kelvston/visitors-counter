@@ -10,7 +10,24 @@
         "number of male visitors in July",
         "female visits in May",
         "visitors for the month of June",
-        "visits in the last quarter"
+        "visits in the last quarter",
+        "How many visitors came today?",
+        "Show today's visitor total",
+        "Give me the visitor count for yesterday",
+        "How many people visited this week?",
+        "Show visitor totals for last week",
+        "How many female visitors came this month?",
+        "How many male visitors came last month?",
+        "Show the visitor total for the last 3 months",
+        "How many people visited all time?",
+        "Hello",
+        "Hi there",
+        "Good morning",
+        "Hey, can you help me?",
+        "What can you help me with?",
+        "Help me use the visitor assistant",
+        "Tell me a joke",
+        "What is the weather?"
     ],
     "annotations": [
         {"intent": "total_visits_by_gender_in_month", "entities": {"month": "June", "gender": "male"}},
@@ -22,7 +39,23 @@
         {"intent": "total_visits_by_gender_in_month", "entities": {"month": "July", "gender": "male"}},
         {"intent": "total_visits_by_gender_in_month", "entities": {"month": "May", "gender": "female"}},
         {"intent": "total_visits_by_gender_in_month", "entities": {"month": "June"}},
-        {"intent": "total_visits_by_gender_in_period", "entities": {"period": "last quarter"}}
+        {"intent": "total_visits_by_gender_in_period", "entities": {"period": "last quarter"}},
+        {"intent": "total_visits_by_gender_in_period", "entities": {"period": "today"}},
+        {"intent": "total_visits_by_gender_in_period", "entities": {"period": "today"}},
+        {"intent": "total_visits_by_gender_in_period", "entities": {"period": "yesterday"}},
+        {"intent": "total_visits_by_gender_in_period", "entities": {"period": "this week"}},
+        {"intent": "total_visits_by_gender_in_period", "entities": {"period": "last week"}},
+        {"intent": "total_visits_by_gender_in_period", "entities": {"gender": "female", "period": "this month"}},
+        {"intent": "total_visits_by_gender_in_period", "entities": {"gender": "male", "period": "last month"}},
+        {"intent": "total_visits_by_gender_in_period", "entities": {"period": "last 3 months"}},
+        {"intent": "total_visits_by_gender_in_period", "entities": {"period": "all time"}},
+        {"intent": "greeting", "entities": {}},
+        {"intent": "greeting", "entities": {}},
+        {"intent": "greeting", "entities": {}},
+        {"intent": "greeting", "entities": {}},
+        {"intent": "help", "entities": {}},
+        {"intent": "help", "entities": {}},
+        {"intent": "unsupported", "entities": {}},
+        {"intent": "unsupported", "entities": {}}
     ]
 }
-

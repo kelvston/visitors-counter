@@ -1,6 +1,60 @@
 @extends('layouts.header')
 
 @section('content')
+    <style>
+        .report-experience {
+            padding-bottom: 2rem;
+        }
+
+        .report-experience .report-chart-card,
+        .report-experience .report-table-card {
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            border-radius: 0.85rem;
+            box-shadow: 0 3px 7px rgba(0, 0, 0, 0.06), 0 14px 28px rgba(0, 0, 0, 0.12);
+            padding: 1rem;
+            margin-bottom: 1.25rem;
+            transform: perspective(1000px) translateY(0);
+            transition: transform 220ms ease, box-shadow 220ms ease;
+        }
+
+        .report-experience .report-chart-card {
+            height: calc(100% - 1.25rem);
+        }
+
+        .report-experience .report-chart-card:hover,
+        .report-experience .report-table-card:hover {
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08), 0 22px 40px rgba(0, 0, 0, 0.16);
+            transform: perspective(1000px) translateY(-5px) rotateX(1deg);
+        }
+
+        .report-experience .report-section-title {
+            margin: 1.5rem 0 1rem;
+            font-weight: 600;
+        }
+
+        .report-experience #exportBtn,
+        .report-experience #exportBtnNews {
+            margin: 1rem 0;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.14);
+            transition: transform 180ms ease, box-shadow 180ms ease;
+        }
+
+        .report-experience #exportBtn:hover,
+        .report-experience #exportBtnNews:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 7px 16px rgba(0, 0, 0, 0.18);
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .report-experience .report-chart-card,
+            .report-experience .report-table-card,
+            .report-experience #exportBtn,
+            .report-experience #exportBtnNews {
+                transition: none;
+            }
+        }
+    </style>
+    <main class="report-experience">
     <ul class="nav nav-tabs">
         <li class="nav-item">
             <a class="nav-link active" data-toggle="tab" href="#visitors">Visitors Report</a>
@@ -41,7 +95,8 @@
     <button id="exportBtn" class="btn btn-primary">Export to Excel</button>
 
 
-            <h3>Visitors Report</h3>
+            <h3 class="report-section-title">Visitors Report</h3>
+            <div class="report-table-card">
             <table class="table table-bordered table-striped table-bordered" id="visitorTable">
 {{--            <table id="visitorTable" class="table table-striped table-bordered">--}}
                 <thead>
@@ -67,25 +122,36 @@
                 @endforeach
                 </tbody>
             </table>
+            </div>
             <div class="row">
                 <div class="col-md-8">
+                    <div class="report-chart-card">
                     <canvas id="genderTrendChart" style="height:400px;" ></canvas>
+                    </div>
                 </div>
                 <div class="col-md-4">
+                    <div class="report-chart-card">
                     <canvas id="genderPieChart" style="width:100%; height:100%;"></canvas>
+                    </div>
                 </div>
 {{--                <canvas id="visitorTrendChart" width="400" height="200"></canvas>--}}
             </div>
 
             <div class="row">
                 <div class="col-md-8">
+                    <div class="report-chart-card">
                     <canvas id="seasonalityChart" width="400" height="200"></canvas>
+                    </div>
                 </div>
                 <div class="col-md-4">
+                    <div class="report-chart-card">
                     <canvas id="movingAvgChart" width="400" height="200"></canvas>
+                    </div>
                 </div>
                 <div class="col-md-8">
+                    <div class="report-chart-card">
                     <canvas id="visitorTrendChart" width="400" height="200"></canvas>
+                    </div>
                 </div>
 
 
@@ -120,6 +186,7 @@
             <button id="exportBtnNews" class="btn btn-primary">Export to Excel</button>
 
             <!-- Table for Newsletter Data -->
+            <div class="report-table-card">
             <table class="table table-bordered table-striped table-bordered" id="newsletterTable">
                 <thead>
                 <tr>
@@ -154,10 +221,12 @@
                 @endforeach
                 </tbody>
             </table>
+            </div>
 
 
         </div>
         </div>
+    </main>
 
 
 

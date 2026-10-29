@@ -5,6 +5,7 @@ use App\Http\Controllers\VisitorsCounterController;
 use App\Http\Controllers\NewsLetterController;
 use App\Http\Controllers\reportController;
 use App\Http\Controllers\ChatbotController;
+use App\Http\Controllers\ChatbotTrainingController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -29,8 +30,15 @@ Route::middleware('auth')->group(function () {
 Route::get('/reports', [VisitorsCounterController::class, 'show'])->name('counter.report');
 Route::post('/report', [VisitorsCounterController::class, 'increment'])->name('counter.increment');
 Route::post('/multiple', [VisitorsCounterController::class, 'incrementMultiple'])->name('counter.increment.multiple');
-Route::get('/chatbot', [VisitorsCounterController::class, 'index']);
-Route::post('/chatbot', [VisitorsCounterController::class, 'respond']);
+Route::middleware('auth')->group(function () {
+    Route::get('/chatbot', [VisitorsCounterController::class, 'index'])->name('chatbot.index');
+    Route::post('/chatbot', [VisitorsCounterController::class, 'respond'])->name('chatbot.respond');
+});
+Route::middleware(['auth', 'throttle:10,1'])->prefix('admin/chatbot-training')->name('chatbot.training.')->group(function () {
+    Route::get('/', [ChatbotTrainingController::class, 'index'])->name('index');
+    Route::post('/examples', [ChatbotTrainingController::class, 'store'])->name('examples.store');
+    Route::post('/train', [ChatbotTrainingController::class, 'train'])->name('train');
+});
 Route::get('/visitor-summary', [VisitorsCounterController::class, 'getVisitorSummary'])->name('visitor.summary');
 Route::get('/visitor-data', [VisitorsCounterController::class, 'getVisitorDataForChatbot'])->name('visitor.data');
 Route::post('/analyze-text', [VisitorsCounterController::class, 'analyzeTextWithSpacy']);

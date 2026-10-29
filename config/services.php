@@ -35,4 +35,13 @@ return [
         ],
     ],
 
+    'chatbot' => [
+        'python_binary' => env(
+            'CHATBOT_PYTHON_BINARY',
+            base_path(PHP_OS_FAMILY === 'Windows' ? '.venv/Scripts/python.exe' : '.venv/bin/python')
+        ),
+        'model_path' => env('CHATBOT_NLP_MODEL_PATH', storage_path('app/chatbot-nlp-model')),
+        'training_data_path' => storage_path('app/chatbot-training.json'),
+    ],
+
 ];

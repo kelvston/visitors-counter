@@ -127,6 +127,60 @@
         background-color: #f2f2f2; /* Optional: Makes header stand out */
     }
 
+    .container .card {
+      border-radius: 0.85rem;
+      box-shadow:
+        0 2px 5px rgba(0, 0, 0, 0.06),
+        0 10px 24px rgba(0, 0, 0, 0.08),
+        inset 0 1px 0 rgba(255, 255, 255, 0.55) !important;
+      transform: perspective(1000px) translateY(0) rotateX(0);
+      transform-style: preserve-3d;
+      transition: transform 220ms ease, box-shadow 220ms ease;
+    }
+
+    .container .card .card-header {
+      padding: 0.9rem 1.1rem;
+      font-weight: 600;
+    }
+
+    .container .card .card-body {
+      padding: 1.25rem;
+    }
+
+    .container .card .table th,
+    .container .card .table td {
+      vertical-align: middle;
+    }
+
+    .container .card button,
+    .container .card .btn {
+      transition: box-shadow 180ms ease, transform 180ms ease;
+    }
+
+    .container .card button:hover,
+    .container .card .btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.14);
+    }
+
+    @media (hover: hover) and (pointer: fine) {
+      .container .card:hover {
+        box-shadow:
+          0 5px 10px rgba(0, 0, 0, 0.07),
+          0 20px 38px rgba(0, 0, 0, 0.14),
+          inset 0 1px 0 rgba(255, 255, 255, 0.55) !important;
+        transform: perspective(1000px) translateY(-5px) rotateX(1deg);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .container .card,
+      .container .card button,
+      .container .card .btn {
+        transition: none;
+      }
+    }
+
   </style>
 </head>
 
@@ -156,7 +210,10 @@
                 <li class='nav-item'>
                     <a class='nav-link' href="/proposal">Proposal</a>
                 </li>
-                    <li class='nav-item relative'>
+                    <li class='nav-item'>
+                        <a class='nav-link' href="{{ route('chatbot.training.index') }}">Train Chatbot</a>
+                    </li>
+                <li class='nav-item relative'>
                         <a class='nav-link'>{{ Auth::user()->name }}</a>
                     </li>
                     <li class='nav-item'>

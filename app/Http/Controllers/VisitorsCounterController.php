@@ -8,6 +8,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Http;
+use Symfony\Component\Process\Process;
 
 class VisitorsCounterController extends Controller
 {
@@ -288,38 +289,118 @@ class VisitorsCounterController extends Controller
 //    }
     public function respond(Request $request)
     {
-        $input = $request->input('message');
+        $validated = $request->validate([
+            'message' => ['required', 'string', 'max:500'],
+        ]);
 
-        $pythonScript = base_path('nlp/nlp/chatbot.py');
-         $pythonPath = 'C:\\Users\\yoga\\AppData\\Local\\Programs\\Python\\Python312\\python.exe';
-        // $pythonPath = 'python';
+        $process = new Process(
+            [config('services.chatbot.python_binary'), base_path('nlp/nlp/chatbot.py')],
+            base_path(),
+            ['CHATBOT_NLP_MODEL_PATH' => config('services.chatbot.model_path')]
+        );
+        $process->setInput(json_encode(['message' => $validated['message']], JSON_THROW_ON_ERROR));
+        $process->setTimeout(20);
 
-        $process = proc_open("\"$pythonPath\" \"$pythonScript\"", [
-            0 => ['pipe', 'r'], // STDIN
-            1 => ['pipe', 'w'], // STDOUT
-            2 => ['pipe', 'w']  // STDERR
-        ], $pipes);
+        try {
+            $process->mustRun();
+            $analysis = json_decode($process->getOutput(), true, 512, JSON_THROW_ON_ERROR);
+        } catch (\Throwable $exception) {
+            Log::error('Chatbot NLP process failed.', [
+                'message' => $exception->getMessage(),
+                'stderr' => $process->getErrorOutput(),
+            ]);
 
-        if (is_resource($process)) {
-            fwrite($pipes[0], json_encode(['message' => $input]));
-            fclose($pipes[0]);
-
-            $response = stream_get_contents($pipes[1]);
-            fclose($pipes[1]);
-
-            $error = stream_get_contents($pipes[2]);
-            fclose($pipes[2]);
-
-            proc_close($process);
-
-            if (!empty($error)) {
-                return response()->json(['reply' => 'There was an error: ' . $error]);
-            }
-
-            return response()->json(json_decode($response));
+            return response()->json([
+                'reply' => 'The language model is unavailable. Please contact an administrator.',
+            ], 503);
         }
 
-        return response()->json(['reply' => 'Failed to initiate chat engine.']);
+        if (isset($analysis['error'])) {
+            Log::error('Chatbot NLP model returned an error.', ['error' => $analysis['error']]);
+
+            return response()->json([
+                'reply' => 'The language model is unavailable. Please contact an administrator.',
+            ], 503);
+        }
+
+        if (in_array($analysis['intent'] ?? null, ['greeting', 'help'], true)) {
+            $reply = $analysis['intent'] === 'greeting'
+                ? 'Hello! Ask me about visitor totals, such as "How many visitors came this week?"'
+                : 'I can answer questions about visitor totals. Ask about a date, period, or visitor gender.';
+
+            return response()->json(['reply' => $reply]);
+        }
+
+        if (($analysis['intent'] ?? 'unsupported') === 'unsupported') {
+            return response()->json([
+                'reply' => 'I could not understand that yet. An administrator can improve my responses by adding examples and retraining the model.',
+            ]);
+        }
+
+        $entities = collect($analysis['entities'] ?? []);
+        $genderIds = $entities
+            ->where('label', 'GENDER')
+            ->map(fn (array $entity) => match (mb_strtolower($entity['text'])) {
+                'male', 'males', 'man', 'men', 'boy', 'boys' => 1,
+                'female', 'females', 'woman', 'women', 'girl', 'girls' => 2,
+                'other' => 3,
+                default => null,
+            })
+            ->filter()
+            ->unique()
+            ->values()
+            ->all();
+
+        $periodEntity = $entities->first(fn (array $entity) => in_array($entity['label'], ['PERIOD', 'DATE'], true));
+        $periodText = mb_strtolower($periodEntity['text'] ?? 'today');
+        [$periodLabel, $start, $end] = $this->chatbotDateRange($periodText);
+
+        $query = Counter::query()->where('user_id', $request->user()->id);
+        if ($start && $end) {
+            $query->whereBetween('created_at', [$start, $end]);
+        }
+        if ($genderIds) {
+            $query->whereIn('gender', $genderIds);
+        }
+
+        $count = (int) $query->sum('counts');
+        $genderLabel = match ($genderIds) {
+            [1] => 'male ',
+            [2] => 'female ',
+            [3] => 'other ',
+            default => '',
+        };
+
+        return response()->json([
+            'reply' => "There were {$count} {$genderLabel}visitors {$periodLabel}.",
+        ]);
+    }
+
+    private function chatbotDateRange(string $period): array
+    {
+        if (preg_match('/\b(january|february|march|april|may|june|july|august|september|october|november|december)\b/i', $period, $matches)) {
+            $month = Carbon::parse('1 '.$matches[1]);
+
+            return [$month->format('F Y'), $month->startOfMonth(), $month->endOfMonth()];
+        }
+
+        if (preg_match('/\b(last|past)\s+(\d+)\s+months?\b/', $period, $matches)) {
+            $months = max(1, min(60, (int) $matches[2]));
+            $start = Carbon::now()->subMonthsNoOverflow($months)->startOfDay();
+
+            return ["the last {$months} ".($months === 1 ? 'month' : 'months'), $start, Carbon::now()];
+        }
+
+        return match (true) {
+            str_contains($period, 'yesterday') => ['yesterday', Carbon::yesterday(), Carbon::yesterday()->endOfDay()],
+            str_contains($period, 'last week') => ['last week', Carbon::now()->subWeek()->startOfWeek(), Carbon::now()->subWeek()->endOfWeek()],
+            str_contains($period, 'week') => ['this week', Carbon::now()->startOfWeek(), Carbon::now()],
+            str_contains($period, 'last month') => ['last month', Carbon::now()->subMonthNoOverflow()->startOfMonth(), Carbon::now()->subMonthNoOverflow()->endOfMonth()],
+            str_contains($period, 'month') => ['this month', Carbon::now()->startOfMonth(), Carbon::now()],
+            str_contains($period, 'year') => ['this year', Carbon::now()->startOfYear(), Carbon::now()],
+            str_contains($period, 'all time'), str_contains($period, 'all-time'), str_contains($period, 'ever') => ['all time', null, null],
+            default => ['today', Carbon::today(), Carbon::today()->endOfDay()],
+        };
     }
 
     public function mapGender($genderStr)
@@ -429,8 +510,7 @@ class VisitorsCounterController extends Controller
 
 public function index()
 {
-    dd(11);
-    return view('chatbot.index');
+    return redirect()->route('counter.report');
 }
 
 public function getVisitorDataForChatbot(Request $request)

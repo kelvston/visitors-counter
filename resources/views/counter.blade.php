@@ -424,7 +424,7 @@ body {
 {{--        <button type="submit">Send</button>--}}
 {{--    </form>--}}
     <!-- Toggle button -->
-    <button class="chat-toggle" onclick="toggleChat()">💬</button>
+    <button type="button" class="chat-toggle" onclick="toggleChat()" aria-label="Open visitor assistant">💬</button>
 
     <!-- Chat UI -->
     <div class="chat-container" id="chat-container">
@@ -432,10 +432,10 @@ body {
             <div class="message bot">Hi! I'm your library assistant. How can I help you today?</div>
         </div>
         <div class="typing" id="typing" style="display:none;">Bot is typing...</div>
-        <div class="input-area">
-            <input type="text" id="user-input" placeholder="Type your question...">
-            <button onclick="sendMessage()">Send</button>
-        </div>
+        <form class="input-area" onsubmit="event.preventDefault(); sendMessage();">
+            <input type="text" id="user-input" placeholder="Type your question..." maxlength="500" autocomplete="off">
+            <button type="submit">Send</button>
+        </form>
     </div>
 
 @endsection
@@ -464,32 +464,46 @@ body {
         box.scrollTop = box.scrollHeight;
     }
 
-    function sendMessage() {
+    let isChatSending = false;
+
+    async function sendMessage() {
         const input = document.getElementById('user-input');
         const message = input.value.trim();
-        if (!message) return;
+        if (!message || isChatSending) return;
 
         appendMessage(message, 'user');
         input.value = '';
+        isChatSending = true;
         showTyping(true);
 
-        fetch('/chatbot', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': '{{ csrf_token() }}'
-            },
-            body: JSON.stringify({ message: message })
-        })
-            .then(res => res.json())
-            .then(data => {
-                showTyping(false);
-                appendMessage(data.reply, 'bot');
-            })
-            .catch(() => {
-                showTyping(false);
-                appendMessage('Sorry, something went wrong.', 'bot');
+        try {
+            const response = await fetch('{{ route('chatbot.respond') }}', {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({ message })
             });
+
+            const data = await response.json();
+            if (!response.ok) {
+                throw new Error(data.reply || `Chat request failed with status ${response.status}`);
+            }
+
+            if (typeof data.reply !== 'string') {
+                throw new Error('Chat response did not contain a reply.');
+            }
+
+            appendMessage(data.reply, 'bot');
+        } catch (error) {
+            console.error('Chatbot request failed:', error);
+            appendMessage(error instanceof Error ? error.message : 'Sorry, I could not get a response. Please try again.', 'bot');
+        } finally {
+            isChatSending = false;
+            showTyping(false);
+        }
     }
 
     function showTyping(show) {
@@ -522,6 +536,8 @@ body {
 
     document.addEventListener('DOMContentLoaded', function () {
         document.addEventListener('keypress', function (event) {
+            if (event.target.closest && event.target.closest('#chat-container')) return;
+
             if (event.key === 'Enter' && document.getElementById('genderSelectContainer').style.display === 'none') {
                 event.preventDefault();
                 showGenderSelect();
@@ -537,6 +553,8 @@ body {
                 });
 
                 document.addEventListener('keydown', function(event) {
+            if (event.target.closest && event.target.closest('#chat-container')) return;
+
             if (event.shiftKey && document.getElementById('multiple').style.display === 'none') {
                 event.preventDefault();
                 showMultiple();

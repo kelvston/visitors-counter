@@ -27,7 +27,21 @@ class AuthenticationTest extends TestCase
         ]);
 
         $this->assertAuthenticated();
-        $response->assertRedirect(route('report', absolute: false));
+        $response->assertRedirect(route('counter.report', absolute: false));
+    }
+
+    public function test_users_are_redirected_to_reports_even_when_they_intended_to_visit_dashboard(): void
+    {
+        $user = User::factory()->create();
+
+        $this->get('/dashboard');
+
+        $response = $this->post('/login', [
+            'email' => $user->email,
+            'password' => 'password',
+        ]);
+
+        $response->assertRedirect(route('counter.report', absolute: false));
     }
 
     public function test_users_can_not_authenticate_with_invalid_password(): void
