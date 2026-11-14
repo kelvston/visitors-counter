@@ -5,8 +5,12 @@ namespace App\Http\Controllers;
 use App\Models\Counter;
 use App\Models\Proposal;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class reportController extends Controller
 {
@@ -15,23 +19,7 @@ class reportController extends Controller
      */
     public function search(Request $request)
     {
-        $query = Proposal::query();
-
-        if ($request->filled('search')) {
-            $search = strtolower($request->search);
-            $query->whereRaw('LOWER(title) LIKE ?', ["%{$search}%"]);
-        }
-
-        if ($request->filled('from')) {
-            $query->whereDate('timeline', '>=', $request->from);
-        }
-
-        if ($request->filled('to')) {
-            $query->whereDate('timeline', '<=', $request->to);
-        }
-
-
-        $proposals = $query->latest()->paginate(10)->withQueryString();
+        $proposals = $this->proposalQuery($request)->latest()->paginate(10)->withQueryString();
 
 
         return view('proposals.partials.table', compact('proposals'));
@@ -44,40 +32,89 @@ class reportController extends Controller
 
     public function storeProposal(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'title' => 'required|string|max:255',
-            'timeline' => 'required|string|max:255',
+            'timeline_from' => 'required|date',
+            'timeline_to' => 'required|date|after_or_equal:timeline_from',
+            'destination' => 'required|string|max:2048',
             'details' => 'required|string',
             'attachment' => 'required|mimes:pdf|max:5048', // only PDF, max 2MB
         ]);
 
-        $filePath = $request->file('attachment')->store('proposals', 'public');
-       Proposal::create([
-            'title' => $request->title,
-            'timeline' => $request->timeline,
-            'details' => $request->details,
+        $filePath = $validated['attachment']->store('proposals', 'public');
+        Proposal::create([
+            'title' => $validated['title'],
+            'timeline' => $validated['timeline_from'].' to '.$validated['timeline_to'],
+            'timeline_from' => $validated['timeline_from'],
+            'timeline_to' => $validated['timeline_to'],
+            'destination' => $validated['destination'],
+            'details' => $validated['details'],
             'attachment' => $filePath,
         ]);
 
 
         return redirect()->route('proposal')->with('success', 'Proposal submitted successfully!');
     }
+
+    public function downloadAttachment(Proposal $proposal): StreamedResponse
+    {
+        abort_unless(Storage::disk('public')->exists($proposal->attachment), 404);
+
+        $filename = (Str::slug($proposal->title) ?: 'proposal').'.pdf';
+
+        return Storage::disk('public')->download($proposal->attachment, $filename, [
+            'Content-Type' => 'application/pdf',
+        ]);
+    }
+
     public function indexProposal(Request $request)
     {
-        $query = Proposal::query();
-
-        if ($request->filled('search')) {
-            $query->where('title', 'like', '%' . $request->search . '%');
-        }
-
-        // Filter by date range
-        if ($request->filled('from') && $request->filled('to')) {
-            $query->whereBetween('created_at', [$request->from, $request->to]);
-        }
-
-        $proposals = $query->latest()->paginate(10)->withQueryString();
+        $proposals = $this->proposalQuery($request)->latest()->paginate(10)->withQueryString();
 
         return view('proposal', compact('proposals'));
+    }
+
+    private function proposalQuery(Request $request): Builder
+    {
+        $filters = $request->validate([
+            'search' => ['nullable', 'string', 'max:255'],
+            'from' => ['nullable', 'date'],
+            'to' => ['nullable', 'date', 'after_or_equal:from'],
+        ]);
+
+        $query = Proposal::query();
+
+        if (! empty($filters['search'])) {
+            $query->whereRaw('LOWER(title) LIKE ?', ['%'.strtolower($filters['search']).'%']);
+        }
+
+        if (! empty($filters['from']) || ! empty($filters['to'])) {
+            $query->where(function (Builder $dateQuery) use ($filters) {
+                $dateQuery->where(function (Builder $rangeQuery) use ($filters) {
+                    $rangeQuery->whereNotNull('timeline_from');
+
+                    if (! empty($filters['from'])) {
+                        $rangeQuery->whereDate('timeline_to', '>=', $filters['from']);
+                    }
+
+                    if (! empty($filters['to'])) {
+                        $rangeQuery->whereDate('timeline_from', '<=', $filters['to']);
+                    }
+                })->orWhere(function (Builder $legacyQuery) use ($filters) {
+                    $legacyQuery->whereNull('timeline_from');
+
+                    if (! empty($filters['from'])) {
+                        $legacyQuery->whereDate('timeline', '>=', $filters['from']);
+                    }
+
+                    if (! empty($filters['to'])) {
+                        $legacyQuery->whereDate('timeline', '<=', $filters['to']);
+                    }
+                });
+            });
+        }
+
+        return $query;
     }
 
     public function index()

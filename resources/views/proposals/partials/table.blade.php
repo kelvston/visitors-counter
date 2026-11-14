@@ -5,6 +5,7 @@
             <tr>
                 <th>Title</th>
                 <th>Timeline</th>
+                <th>Where to Submit</th>
                 <th>Details</th>
                 <th>PDF</th>
                 <th>Submitted At</th>
@@ -14,11 +15,26 @@
             @foreach($proposals as $proposal)
                 <tr>
                     <td>{{ $proposal->title }}</td>
-                    <td>{{ $proposal->timeline }}</td>
+                    <td>
+                        @if($proposal->timeline_from && $proposal->timeline_to)
+                            {{ $proposal->timeline_from->format('d M Y') }} – {{ $proposal->timeline_to->format('d M Y') }}
+                        @else
+                            {{ $proposal->timeline }}
+                        @endif
+                    </td>
+                    <td>
+                        @if(filter_var($proposal->destination, FILTER_VALIDATE_URL))
+                            <a href="{{ $proposal->destination }}" target="_blank" rel="noopener noreferrer">
+                                {{ $proposal->destination }}
+                            </a>
+                        @else
+                            {{ $proposal->destination ?: '—' }}
+                        @endif
+                    </td>
                     <td>{{ Str::limit($proposal->details, 50) }}</td>
                     <td>
-                        @if($proposal->attachment_url)
-                            <a href="{{ $proposal->attachment_url }}" target="_blank" class="btn btn-sm btn-primary">
+                        @if($proposal->attachment)
+                            <a href="{{ route('proposals.download', $proposal) }}" class="btn btn-sm btn-primary">
                                 Download
                             </a>
                         @else

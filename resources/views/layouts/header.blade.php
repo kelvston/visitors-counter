@@ -57,29 +57,189 @@
     margin: 0 10px; /* Adjust the spacing between items */
 }
 
+.compact-entry-form {
+    max-width: 760px;
+    margin-inline: auto;
+}
+
+.compact-entry-form .mb-3 {
+    margin-bottom: 0.75rem !important;
+}
+
+.compact-entry-form .form-label {
+    margin-bottom: 0.25rem;
+    font-size: 0.95rem;
+    font-weight: 500;
+}
+
+.compact-entry-form .form-control {
+    padding: 0.4rem 0.65rem;
+}
+
+.attendee-options {
+    max-height: 220px;
+    overflow-y: auto;
+    border: 1px solid #d5dce3;
+    border-radius: 0.25rem;
+    background: #fff;
+}
+
+.attendee-option {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 210px;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.4rem 0.6rem;
+}
+
+.attendee-option .form-select {
+    width: 100%;
+    min-width: 0;
+}
+
+.attendee-option + .attendee-option {
+    border-top: 1px solid #edf0f2;
+}
+
+.attendee-person {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    min-width: 0;
+    margin: 0;
+    cursor: pointer;
+}
+
+.attendee-person .form-check-input {
+    position: static !important;
+    flex: 0 0 auto;
+    margin: 0;
+}
+
+.attendee-person span {
+    display: grid;
+    min-width: 0;
+}
+
+.attendee-person small {
+    overflow: hidden;
+    color: #6c757d;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+@media (max-width: 575.98px) {
+    .attendee-option {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 0.35rem;
+    }
+
+    .attendee-option .form-select {
+        margin-left: 1.4rem;
+        width: calc(100% - 1.4rem);
+    }
+}
+
+.top_menu .nav-item > .nav-link,
+.top_menu .nav-item > form > .nav-link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 40px;
+    padding: 0.55rem 0.75rem;
+    border-radius: 0.35rem;
+    color: #fff;
+    transition: background-color 140ms ease, color 140ms ease;
+}
+
+.top_menu .nav-item > .nav-link:hover,
+.top_menu .nav-item > form > .nav-link:hover {
+    color: #fff;
+    background-color: rgba(255, 255, 255, 0.16);
+}
+
+.top_menu .nav-item > .nav-link:focus-visible,
+.top_menu .nav-item > form > .nav-link:focus-visible {
+    color: #fff;
+    outline: 2px solid rgba(255, 255, 255, 0.9);
+    outline-offset: 2px;
+}
+
+.navigation-dropdown .dropdown-menu {
+    width: auto;
+    min-width: 0;
+    max-width: calc(100vw - 1rem);
+    margin-top: 0;
+    padding: 0.25rem 0.3rem;
+    background-color: #80902d;
+    border: 1px solid rgba(255, 255, 255, 0.28);
+    box-shadow: 0 0.45rem 1rem rgba(24, 35, 8, 0.22);
+}
+
+.publication-dropdown > .dropdown-menu,
+.publication-submenu > .dropdown-menu,
+.settings-dropdown > .dropdown-menu,
+.user-dropdown > .dropdown-menu {
+    border-radius: 0;
+}
+
+.navigation-dropdown .dropdown-menu > li {
+    display: block;
+    width: auto;
+    text-align: left;
+}
+
+.navigation-dropdown .dropdown-item {
+    display: block;
+    width: 100%;
+    white-space: nowrap;
+    padding: 0.4rem 0.55rem;
+    border-radius: 0.2rem;
+    color: #fff;
+    font-size: 0.9rem;
+    font-weight: 500;
+    line-height: 1.25;
+    text-align: left;
+    transition: background-color 140ms ease, color 140ms ease;
+}
+
+.navigation-dropdown .dropdown-item:hover,
+.navigation-dropdown .dropdown-item:focus {
+    color: #fff;
+    background-color: rgba(255, 255, 255, 0.16);
+}
+
+.navigation-dropdown .dropdown-item:focus-visible {
+    outline: 2px solid rgba(255, 255, 255, 0.9);
+    outline-offset: -3px;
+}
+
+.publication-submenu {
+    position: relative;
+}
+
+.publication-submenu > .dropdown-menu {
+    top: 0;
+    left: 100%;
+    margin-top: -0.45rem;
+    margin-left: 0;
+}
+
+.publication-submenu > .dropdown-menu:not([hidden]) {
+    display: block;
+}
+
+.publication-submenu > .dropdown-toggle::after {
+    float: right;
+    margin-top: 0.55rem;
+}
+
 .btn-link {
     font-size: 16px; /* Ensure button text matches link text */
     color: #007bff; /* Match the color with other links */
     text-decoration: none; /* Remove underline from button text */
 }
 
-    .relative {
-      position: relative;
-    }
-
-    .absolute {
-      position: absolute;
-      top: 100%;
-      right: 0;
-      z-index: 10;
-      display: none;
-    }
-
-    .relative:hover .absolute {
-      display: block;
-    }
-
-    .event-main-div {
+        .event-main-div {
       border: 1px solid #D55E1C;
     }
 
@@ -200,23 +360,59 @@
                     <li class='nav-item'>
                         <a class='nav-link' href='{{ route('counter.report') }}'>Visitors</a>
                     </li>
-                    <li class='nav-item'>
-                        <a class='nav-link' href='/barcode'>Barcode</a>
+                    <li class="nav-item dropdown publication-dropdown navigation-dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="publicationDropdown" role="button"
+                           data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">Publication</a>
+                        <ul class="dropdown-menu" aria-labelledby="publicationDropdown">
+                            @if(Auth::user()->isAdmin())
+                                <li class="publication-submenu">
+                                    <button class="dropdown-item dropdown-toggle" type="button"
+                                            data-publication-submenu="administrationSubmenu" aria-expanded="false">
+                                        Administration
+                                    </button>
+                                    <ul class="dropdown-menu" id="administrationSubmenu" hidden>
+                                        <li><a class="dropdown-item" href="/barcode">Barcode</a></li>
+                                        <li><a class="dropdown-item" href="{{ route('admin.meetings.index') }}">Meeting Management</a></li>
+                                    </ul>
+                                </li>
+                            @endif
+                            @if(Auth::user()->isAcademicStaff() || Auth::user()->isAdmin())
+                                <li class="publication-submenu">
+                                    <button class="dropdown-item dropdown-toggle" type="button"
+                                            data-publication-submenu="academicsSubmenu" aria-expanded="false">
+                                        Academics
+                                    </button>
+                                    <ul class="dropdown-menu" id="academicsSubmenu" hidden>
+                                        <li><a class="dropdown-item" href="{{ route('proposal') }}">Proposal Management</a></li>
+                                        <li><a class="dropdown-item" href="{{ route('academics.meetings.index') }}">Minutes Management</a></li>
+                                    </ul>
+                                </li>
+                            @endif
+                        </ul>
                     </li>
-                <li class='nav-item'>
-                    <a class='nav-link' href="/proposal">Proposal</a>
-                </li>
-                    <li class='nav-item'>
-                        <a class='nav-link' href="{{ route('chatbot.training.index') }}">Train Chatbot</a>
+                    <li class="nav-item dropdown settings-dropdown navigation-dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="settingsDropdown" role="button"
+                           data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">Settings</a>
+                        <ul class="dropdown-menu" aria-labelledby="settingsDropdown">
+                            <li><a class="dropdown-item" href="{{ route('chatbot.training.index') }}">Train Chatbot</a></li>
+                            @if(Auth::user()->isAdmin())
+                                <li><a class="dropdown-item" href="{{ route('admin.users.index') }}">Manage Users</a></li>
+                            @endif
+                        </ul>
                     </li>
-                <li class='nav-item relative'>
-                        <a class='nav-link'>{{ Auth::user()->name }}</a>
-                    </li>
-                    <li class='nav-item'>
-                        <form method="POST" action="{{ route('logout') }}" class="d-inline">
-                            @csrf
-                            <button type="submit" class="btn btn-link nav-link">{{ __('Log Out') }}</button>
-                        </form>
+                    <li class="nav-item dropdown user-dropdown navigation-dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
+                           data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
+                            {{ Auth::user()->name }}
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="userDropdown">
+                            <li>
+                                <form method="POST" action="{{ route('logout') }}">
+                                    @csrf
+                                    <button type="submit" class="dropdown-item">{{ __('Log Out') }}</button>
+                                </form>
+                            </li>
+                        </ul>
                     </li>
                 @else
                     <script>
@@ -261,9 +457,72 @@
       <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
       @stack('scripts')
       <script>
-        document.querySelector('.relative').addEventListener('click', function () {
-          var dropdown = this.querySelector('.absolute');
-          dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+        document.querySelectorAll('.navigation-dropdown').forEach(function (dropdown) {
+          var toggle = dropdown.querySelector(':scope > .dropdown-toggle');
+          var menu = dropdown.querySelector(':scope > .dropdown-menu');
+          var closeTimer;
+
+          dropdown.addEventListener('mouseenter', function () {
+            window.clearTimeout(closeTimer);
+            menu.classList.add('show');
+            toggle.setAttribute('aria-expanded', 'true');
+          });
+
+          dropdown.addEventListener('mouseleave', function () {
+            closeTimer = window.setTimeout(function () {
+              if (dropdown.matches(':hover')) {
+                return;
+              }
+
+              menu.classList.remove('show');
+              toggle.setAttribute('aria-expanded', 'false');
+              dropdown.querySelectorAll('.publication-submenu .dropdown-menu').forEach(function (submenu) {
+                submenu.hidden = true;
+                submenu.previousElementSibling.setAttribute('aria-expanded', 'false');
+              });
+            }, 200);
+          });
+        });
+
+        document.querySelectorAll('[data-publication-submenu]').forEach(function (toggle) {
+          var submenuItem = toggle.closest('.publication-submenu');
+          var submenu = document.getElementById(toggle.dataset.publicationSubmenu);
+          var submenuCloseTimer;
+
+          submenuItem.addEventListener('mouseenter', function () {
+            window.clearTimeout(submenuCloseTimer);
+            document.querySelectorAll('.publication-submenu .dropdown-menu').forEach(function (menu) {
+              menu.hidden = true;
+              menu.previousElementSibling.setAttribute('aria-expanded', 'false');
+            });
+
+            submenu.hidden = false;
+            toggle.setAttribute('aria-expanded', 'true');
+          });
+
+          submenuItem.addEventListener('mouseleave', function () {
+            submenuCloseTimer = window.setTimeout(function () {
+              if (submenuItem.matches(':hover')) {
+                return;
+              }
+
+              submenu.hidden = true;
+              toggle.setAttribute('aria-expanded', 'false');
+            }, 200);
+          });
+
+          toggle.addEventListener('click', function (event) {
+            event.stopPropagation();
+            var shouldOpen = submenu.hidden || submenuItem.matches(':hover');
+
+            document.querySelectorAll('.publication-submenu .dropdown-menu').forEach(function (menu) {
+              menu.hidden = true;
+              menu.previousElementSibling.setAttribute('aria-expanded', 'false');
+            });
+
+            submenu.hidden = !shouldOpen;
+            toggle.setAttribute('aria-expanded', String(shouldOpen));
+          });
         });
       </script>
     </header>

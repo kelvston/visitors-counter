@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Storage;
 
 class Proposal extends Model
 {
@@ -16,16 +15,19 @@ class Proposal extends Model
     protected $fillable = [
         'title',
         'timeline',
+        'timeline_from',
+        'timeline_to',
+        'destination',
         'details',
         'attachment',
     ];
 
-    /**
-     * Optional accessor to get a full URL for the stored PDF.
-     * Usage: $proposal->attachment_url
-     */
-    public function getAttachmentUrlAttribute()
+    protected function casts(): array
     {
-        return $this->attachment ? Storage::url($this->attachment) : null;
+        return [
+            'timeline_from' => 'date:Y-m-d',
+            'timeline_to' => 'date:Y-m-d',
+        ];
     }
+
 }

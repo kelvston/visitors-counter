@@ -6,6 +6,9 @@ use App\Http\Controllers\NewsLetterController;
 use App\Http\Controllers\reportController;
 use App\Http\Controllers\ChatbotController;
 use App\Http\Controllers\ChatbotTrainingController;
+use App\Http\Controllers\Admin\UserManagementController;
+use App\Http\Controllers\Admin\MeetingController;
+use App\Http\Controllers\AcademicMeetingController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -41,6 +44,32 @@ Route::middleware(['auth', 'throttle:10,1'])->prefix('admin/chatbot-training')->
     Route::post('/examples', [ChatbotTrainingController::class, 'store'])->name('examples.store');
     Route::post('/train', [ChatbotTrainingController::class, 'train'])->name('train');
 });
+Route::middleware(['auth', 'admin'])->prefix('admin/users')->name('admin.users.')->group(function () {
+    Route::get('/', [UserManagementController::class, 'index'])->name('index');
+    Route::get('/{user}/edit', [UserManagementController::class, 'edit'])->name('edit');
+    Route::put('/{user}', [UserManagementController::class, 'update'])->name('update');
+    Route::delete('/{user}', [UserManagementController::class, 'destroy'])->name('destroy');
+});
+Route::middleware(['auth', 'admin'])->prefix('admin/meetings')->name('admin.meetings.')->group(function () {
+    Route::get('/', [MeetingController::class, 'index'])->name('index');
+    Route::get('/create', [MeetingController::class, 'create'])->name('create');
+    Route::post('/', [MeetingController::class, 'store'])->name('store');
+    Route::get('/{meeting}/edit', [MeetingController::class, 'edit'])->name('edit');
+    Route::put('/{meeting}', [MeetingController::class, 'update'])->name('update');
+    Route::get('/{meeting}/minutes', [MeetingController::class, 'downloadMinutes'])->name('minutes.download');
+    Route::get('/{meeting}/audio', [MeetingController::class, 'playAudio'])->name('audio');
+    Route::delete('/{meeting}', [MeetingController::class, 'destroy'])->name('destroy');
+});
+Route::middleware(['auth', 'academic'])->prefix('academics/meetings')->name('academics.meetings.')->group(function () {
+    Route::get('/', [AcademicMeetingController::class, 'index'])->name('index');
+    Route::get('/create', [AcademicMeetingController::class, 'create'])->name('create');
+    Route::post('/', [AcademicMeetingController::class, 'store'])->name('store');
+    Route::get('/{meeting}/edit', [AcademicMeetingController::class, 'edit'])->name('edit');
+    Route::put('/{meeting}', [AcademicMeetingController::class, 'update'])->name('update');
+    Route::get('/{meeting}/minutes', [AcademicMeetingController::class, 'downloadMinutes'])->name('minutes.download');
+    Route::get('/{meeting}/audio', [AcademicMeetingController::class, 'playAudio'])->name('audio');
+    Route::delete('/{meeting}', [AcademicMeetingController::class, 'destroy'])->name('destroy');
+});
 Route::get('/visitor-summary', [VisitorsCounterController::class, 'getVisitorSummary'])->name('visitor.summary');
 Route::get('/visitor-data', [VisitorsCounterController::class, 'getVisitorDataForChatbot'])->name('visitor.data');
 Route::post('/analyze-text', [VisitorsCounterController::class, 'analyzeTextWithSpacy']);
@@ -51,11 +80,14 @@ Route::get('/news_leter', [NewsLetterController::class, 'index'])->name('news_le
 Route::post('/news_leter_store', [NewsLetterController::class, 'store'])->name('news_leter.store');
 Route::get('/data', [reportController::class, 'getData'])->name('report.data');
 // routes/web.php
-Route::get('/proposals/create', [reportController::class, 'createProposal'])->name('proposals.create');
-Route::post('/proposals/store', [reportController::class, 'storeProposal'])->name('proposals.store');
-Route::get('/proposal', [reportController::class, 'indexProposal'])->name('proposal');
+Route::middleware(['auth', 'academic'])->group(function () {
+    Route::get('/proposals/create', [reportController::class, 'createProposal'])->name('proposals.create');
+    Route::post('/proposals/store', [reportController::class, 'storeProposal'])->name('proposals.store');
+    Route::get('/proposals/{proposal}/download', [reportController::class, 'downloadAttachment'])->name('proposals.download');
+    Route::get('/proposal', [reportController::class, 'indexProposal'])->name('proposal');
 // routes/web.php
-Route::get('/proposals/search', [reportController::class, 'search'])->name('proposals.search');
+    Route::get('/proposals/search', [reportController::class, 'search'])->name('proposals.search');
+});
 
 
 Route::get('/test-script-path', function () {
