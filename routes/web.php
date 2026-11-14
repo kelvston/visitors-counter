@@ -27,9 +27,11 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
-Route::get('/reports', [VisitorsCounterController::class, 'show'])->name('counter.report');
-Route::post('/report', [VisitorsCounterController::class, 'increment'])->name('counter.increment');
-Route::post('/multiple', [VisitorsCounterController::class, 'incrementMultiple'])->name('counter.increment.multiple');
+Route::middleware('auth')->group(function () {
+    Route::get('/reports', [VisitorsCounterController::class, 'show'])->name('counter.report');
+    Route::post('/report', [VisitorsCounterController::class, 'increment'])->name('counter.increment');
+    Route::post('/multiple', [VisitorsCounterController::class, 'incrementMultiple'])->name('counter.increment.multiple');
+});
 Route::middleware('auth')->group(function () {
     Route::get('/chatbot', [VisitorsCounterController::class, 'index'])->name('chatbot.index');
     Route::post('/chatbot', [VisitorsCounterController::class, 'respond'])->name('chatbot.respond');
@@ -44,7 +46,6 @@ Route::get('/visitor-data', [VisitorsCounterController::class, 'getVisitorDataFo
 Route::post('/analyze-text', [VisitorsCounterController::class, 'analyzeTextWithSpacy']);
 Route::get('/analyze-test', [VisitorsCounterController::class, 'testPythonScript']);
 Route::post('/counter/decrement', [VisitorsCounterController::class, 'decrement'])->name('counter.decrement');
-
 Route::get('/visitor_stats', [reportController::class, 'index'])->name('visitor_stats');
 Route::get('/news_leter', [NewsLetterController::class, 'index'])->name('news_leter');
 Route::post('/news_leter_store', [NewsLetterController::class, 'store'])->name('news_leter.store');

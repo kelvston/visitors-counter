@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 use App\Models\Counter;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -76,11 +75,14 @@ class VisitorsCounterController extends Controller
 
     public function increment(Request $request)
     {
-        $user = Auth::user();
+        $validated = $request->validate([
+            'gender' => ['required', 'integer', 'in:1,2,3'],
+        ]);
+        $user = $request->user();
         $counter = Counter::firstOrCreate(
             [
                 'user_id' => $user->id,
-                'gender' => $request['gender'],
+                'gender' => $validated['gender'],
                 'created_at' => Carbon::today()
             ],
             ['counts' => 0]
@@ -588,12 +590,18 @@ public function getVisitorDataForChatbot(Request $request)
         return response()->json(['success' => false, 'message' => 'No entries found for the specified gender today.']);
     }
 
-    public function incrementMultiple(Request $request){
-            $user = Auth::user();
+    public function incrementMultiple(Request $request)
+    {
+        $validated = $request->validate([
+            'maleCountInput' => ['nullable', 'integer', 'min:0'],
+            'femaleCountInput' => ['nullable', 'integer', 'min:0'],
+            'otherCountInput' => ['nullable', 'integer', 'min:0'],
+        ]);
+        $user = $request->user();
 
-        $male = $request['maleCountInput'] ?? 0;
-        $female = $request['femaleCountInput'] ?? 0;
-        $other = $request['otherCountInput'] ?? 0;
+        $male = $validated['maleCountInput'] ?? 0;
+        $female = $validated['femaleCountInput'] ?? 0;
+        $other = $validated['otherCountInput'] ?? 0;
         if ($male > 0) {
             $counter = Counter::firstOrCreate(
                 [
@@ -637,8 +645,5 @@ public function getVisitorDataForChatbot(Request $request)
 
         \Log::info('Non-AJAX request detected.');
         return redirect()->route('counter.report');
-
-        }
-
-
+    }
 }

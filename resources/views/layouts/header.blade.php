@@ -133,9 +133,7 @@
         0 2px 5px rgba(0, 0, 0, 0.06),
         0 10px 24px rgba(0, 0, 0, 0.08),
         inset 0 1px 0 rgba(255, 255, 255, 0.55) !important;
-      transform: perspective(1000px) translateY(0) rotateX(0);
-      transform-style: preserve-3d;
-      transition: transform 220ms ease, box-shadow 220ms ease;
+      transition: box-shadow 220ms ease;
     }
 
     .container .card .card-header {
@@ -154,12 +152,11 @@
 
     .container .card button,
     .container .card .btn {
-      transition: box-shadow 180ms ease, transform 180ms ease;
+      transition: box-shadow 180ms ease;
     }
 
     .container .card button:hover,
     .container .card .btn:hover {
-      transform: translateY(-1px);
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.14);
     }
 
@@ -169,7 +166,6 @@
           0 5px 10px rgba(0, 0, 0, 0.07),
           0 20px 38px rgba(0, 0, 0, 0.14),
           inset 0 1px 0 rgba(255, 255, 255, 0.55) !important;
-        transform: perspective(1000px) translateY(-5px) rotateX(1deg);
       }
     }
 

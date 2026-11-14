@@ -341,7 +341,7 @@ body {
 
                         <div id="genderSelectContainer" style="display:none; margin-top:20px;">
                             <label for="gender">Select Gender:</label>
-                            <select id="gender" name="gender" class="form-control">
+                            <select id="gender" name="gender" class="form-control" required>
                                 <option value="">Select</option>
                                 <option value="1">Male</option>
                                 <option value="2">Female</option>
@@ -535,6 +535,11 @@ body {
     let isSubmitting = false;
 
     document.addEventListener('DOMContentLoaded', function () {
+        document.getElementById('incrementForm').addEventListener('submit', function (event) {
+            event.preventDefault();
+            submitForm();
+        });
+
         document.addEventListener('keypress', function (event) {
             if (event.target.closest && event.target.closest('#chat-container')) return;
 
@@ -543,7 +548,7 @@ body {
                 showGenderSelect();
             } else if (event.key === 'Enter' && document.getElementById('genderSelectContainer').style.display !== 'none') {
                 event.preventDefault();
-                submitForm();
+                document.getElementById('incrementForm').requestSubmit();
             }
 
             if (event.shiftKey && document.getElementById('multiple').style.display === 'none') {
@@ -639,57 +644,63 @@ body {
     }
 
 
-    function submitForm() {
+    async function submitForm() {
         if (isSubmitting) return;
         isSubmitting = true;
 
         const form = document.getElementById('incrementForm');
-        const formData = new FormData(form);
+        try {
+            const response = await fetch(form.action, {
+                method: form.method,
+                body: new FormData(form),
+                headers: {
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value,
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            });
+            const data = await response.json();
 
-        fetch(form.action, {
-            method: form.method,
-            body: formData,
-            headers: {
-                'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value,
-                'X-Requested-With': 'XMLHttpRequest'
+            if (!response.ok || !data.success) {
+                const validationMessage = data.errors
+                    ? Object.values(data.errors).flat().join(' ')
+                    : data.message;
+                await Swal.fire({
+                    icon: 'error',
+                    title: 'Unable to record count',
+                    text: validationMessage || 'Please try again.'
+                });
+                return;
             }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                Swal.fire({
-    icon: 'success',
-    title: 'Thank you!',
-    text: 'Your action has been successfully recorded.',
-    showConfirmButton: false,
-    timer: 2000,
-    timerProgressBar: true,
-    position: 'center',
-    backdrop: true,
-    customClass: {
-        container: 'my-swal-container',
-        title: 'my-swal-title',
-        text: 'my-swal-text',
-        popup: 'my-swal-popup',
-        timerProgressBar: 'my-swal-timer-progress'
-    },
-    didOpen: () => {
-        // Additional setup if needed
-    }
-}).then(() => {
-            window.location.reload(); // Refresh the page after the alert
-        });
-        document.getElementById('genderSelectContainer').style.display = 'none';
-        form.reset();
-    }
-})
 
-        .catch(error => {
-            console.error('Error:', error);
-        })
-        .finally(() => {
+            await Swal.fire({
+                icon: 'success',
+                title: 'Thank you!',
+                text: 'Your action has been successfully recorded.',
+                showConfirmButton: false,
+                timer: 2000,
+                timerProgressBar: true,
+                position: 'center',
+                backdrop: true,
+                customClass: {
+                    container: 'my-swal-container',
+                    title: 'my-swal-title',
+                    text: 'my-swal-text',
+                    popup: 'my-swal-popup',
+                    timerProgressBar: 'my-swal-timer-progress'
+                }
+            });
+            window.location.reload();
+        } catch (error) {
+            console.error('Unable to submit visitor count:', error);
+            await Swal.fire({
+                icon: 'error',
+                title: 'Unable to record count',
+                text: 'Please check your connection and try again.'
+            });
+        } finally {
             isSubmitting = false;
-        });
+        }
     }
 
     function decrementCount(gender) {
