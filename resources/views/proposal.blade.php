@@ -5,9 +5,11 @@
 
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h1 class="h4 fw-bold">Proposals Pending Submission</h1>
-            <a href="{{ route('proposals.create') }}" class="btn btn-success btn-lg">
-                <i class="bi bi-plus-circle"></i> Submit Proposal
-            </a>
+            @if ($canManage)
+                <a href="{{ route('proposals.create') }}" class="btn btn-success btn-lg">
+                    <i class="bi bi-plus-circle"></i> Submit Proposal
+                </a>
+            @endif
         </div>
 
         <form id="filterForm" class="row g-2 align-items-end mb-3">

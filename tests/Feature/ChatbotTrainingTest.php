@@ -35,16 +35,54 @@ class ChatbotTrainingTest extends TestCase
             ->assertRedirect(route('login'));
     }
 
-    public function test_any_signed_in_user_can_view_training_page_and_add_example(): void
+    public function test_users_without_training_permission_cannot_access_training_endpoints(): void
     {
         $user = User::factory()->create();
 
         $this->actingAs($user)
             ->get(route('chatbot.training.index'))
-            ->assertOk()
-            ->assertSee('Chatbot NLP training');
+            ->assertForbidden();
 
         $this->actingAs($user)
+            ->post(route('chatbot.training.examples.store'), [
+                'text' => 'Tell me the visitor total from yesterday',
+                'intent' => 'total_visits_by_gender_in_period',
+                'period_entity' => 'yesterday',
+            ])
+            ->assertForbidden();
+
+        $this->actingAs($user)
+            ->post(route('chatbot.training.train'))
+            ->assertForbidden();
+
+        $this->assertFileDoesNotExist($this->trainingDataPath);
+    }
+
+    public function test_admin_can_access_training_page_without_a_separate_assignment(): void
+    {
+        $admin = User::factory()->create(['is_admin' => true]);
+
+        $this->actingAs($admin)
+            ->get(route('chatbot.training.index'))
+            ->assertOk()
+            ->assertSee('Chatbot NLP training')
+            ->assertSee('Train Chatbot');
+    }
+
+    public function test_admin_assigned_trainer_can_view_training_page_and_add_example(): void
+    {
+        $trainer = User::factory()->create([
+            'can_train_chatbot' => true,
+            'can_access_settings_navigation' => true,
+        ]);
+
+        $this->actingAs($trainer)
+            ->get(route('chatbot.training.index'))
+            ->assertOk()
+            ->assertSee('Chatbot NLP training')
+            ->assertSee('Train Chatbot');
+
+        $this->actingAs($trainer)
             ->post(route('chatbot.training.examples.store'), [
                 'text' => 'Tell me the visitor total from yesterday',
                 'intent' => 'total_visits_by_gender_in_period',
@@ -60,7 +98,7 @@ class ChatbotTrainingTest extends TestCase
 
     public function test_entity_annotations_must_appear_in_the_training_text(): void
     {
-        $user = User::factory()->create();
+        $user = User::factory()->create(['can_train_chatbot' => true]);
 
         $this->actingAs($user)
             ->from(route('chatbot.training.index'))

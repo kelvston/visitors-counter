@@ -31,6 +31,47 @@
                 @error('staff_category') <small class="text-danger">{{ $message }}</small> @enderror
             </div>
 
+            <fieldset class="mb-4">
+                <legend class="h6">Content management access</legend>
+                <p class="form-text">Users without these permissions can view records but cannot create, edit, or remove them. Minutes permissions grant access to that category. Settings navigation visibility is separate from access to its individual tools.</p>
+                <div class="form-check mb-2">
+                    <input id="can_manage_academic_minutes" name="can_manage_academic_minutes" type="checkbox"
+                           class="form-check-input" value="1"
+                           @checked(old('can_manage_academic_minutes', $user->can_manage_academic_minutes))>
+                    <label class="form-check-label" for="can_manage_academic_minutes">Manage academic meeting minutes</label>
+                </div>
+                <div class="form-check mb-2">
+                    <input id="can_manage_administrative_minutes" name="can_manage_administrative_minutes" type="checkbox"
+                           class="form-check-input" value="1"
+                           @checked(old('can_manage_administrative_minutes', $user->can_manage_administrative_minutes))>
+                    <label class="form-check-label" for="can_manage_administrative_minutes">Manage administrative meeting minutes</label>
+                </div>
+                <div class="form-check">
+                    <input id="can_manage_proposals" name="can_manage_proposals" type="checkbox"
+                           class="form-check-input" value="1"
+                           @checked(old('can_manage_proposals', $user->can_manage_proposals))>
+                    <label class="form-check-label" for="can_manage_proposals">Manage proposals</label>
+                </div>
+                <div class="form-check mt-2">
+                    <input id="can_manage_calendar" name="can_manage_calendar" type="checkbox"
+                           class="form-check-input" value="1"
+                           @checked(old('can_manage_calendar', $user->can_manage_calendar))>
+                    <label class="form-check-label" for="can_manage_calendar">Manage library calendar</label>
+                </div>
+                <div class="form-check mt-2">
+                    <input id="can_train_chatbot" name="can_train_chatbot" type="checkbox"
+                           class="form-check-input" value="1"
+                           @checked(old('can_train_chatbot', $user->can_train_chatbot))>
+                    <label class="form-check-label" for="can_train_chatbot">Train chatbot</label>
+                </div>
+                <div class="form-check mt-2">
+                    <input id="can_access_settings_navigation" name="can_access_settings_navigation" type="checkbox"
+                           class="form-check-input" value="1"
+                           @checked(old('can_access_settings_navigation', $user->can_access_settings_navigation))>
+                    <label class="form-check-label" for="can_access_settings_navigation">View Settings navigation</label>
+                </div>
+            </fieldset>
+
             <div class="mb-3">
                 <label for="password" class="form-label">New password <span class="text-muted">(leave blank to keep current)</span></label>
                 <input id="password" name="password" type="password" class="form-control" autocomplete="new-password">

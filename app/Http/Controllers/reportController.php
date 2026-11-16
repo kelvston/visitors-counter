@@ -70,8 +70,9 @@ class reportController extends Controller
     public function indexProposal(Request $request)
     {
         $proposals = $this->proposalQuery($request)->latest()->paginate(10)->withQueryString();
+        $canManage = $request->user()->canManageProposals();
 
-        return view('proposal', compact('proposals'));
+        return view('proposal', compact('proposals', 'canManage'));
     }
 
     private function proposalQuery(Request $request): Builder

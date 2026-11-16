@@ -1,12 +1,15 @@
 # visitors-counter
 
+For day-to-day instructions on using the library system, see
+[USER_GUIDE.md](USER_GUIDE.md).
+
 ## Chatbot NLP model
 
 The chatbot uses a spaCy intent and entity model trained from `intent_data.json`,
-`entity_data.json`, and additional examples saved by signed-in users.
+`entity_data.json`, and examples added through the training page.
 
-Every signed-in user can open **Train Chatbot**, add labeled examples, and
-retrain the model. The page requires authentication and is rate-limited. Added
+Only administrators and staff assigned the **Train chatbot** permission can
+open **Train Chatbot**, add labeled examples, and retrain the model. Added
 examples are stored in `storage/app/chatbot-training.json`.
 
 The CLI training command is also available:

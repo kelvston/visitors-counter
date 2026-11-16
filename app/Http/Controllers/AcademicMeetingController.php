@@ -36,7 +36,9 @@ class AcademicMeetingController extends Controller
 
         $meetings = $query->latest('meeting_at')->paginate(15)->withQueryString();
 
-        return view('academics.meetings.index', compact('meetings'));
+        $canManage = $request->user()->canManageMinutesFor('academic');
+
+        return view('academics.meetings.index', compact('meetings', 'canManage'));
     }
 
     public function create(): View

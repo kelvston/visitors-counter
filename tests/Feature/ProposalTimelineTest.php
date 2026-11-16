@@ -16,7 +16,10 @@ class ProposalTimelineTest extends TestCase
     public function test_proposal_can_be_submitted_with_a_date_range(): void
     {
         Storage::fake('public');
-        $academic = User::factory()->create(['staff_category' => 'academic']);
+        $academic = User::factory()->create([
+            'staff_category' => 'academic',
+            'can_manage_proposals' => true,
+        ]);
 
         $this->actingAs($academic)->post(route('proposals.store'), [
             'title' => 'Community reading event',
@@ -38,7 +41,10 @@ class ProposalTimelineTest extends TestCase
     public function test_academic_user_can_download_a_proposal_pdf(): void
     {
         Storage::fake('public');
-        $academic = User::factory()->create(['staff_category' => 'academic']);
+        $academic = User::factory()->create([
+            'staff_category' => 'academic',
+            'can_manage_proposals' => true,
+        ]);
         $path = UploadedFile::fake()->createWithContent('proposal.pdf', '%PDF test contents')
             ->store('proposals', 'public');
         $proposal = Proposal::create([
@@ -63,7 +69,10 @@ class ProposalTimelineTest extends TestCase
     public function test_download_returns_not_found_when_the_pdf_is_missing(): void
     {
         Storage::fake('public');
-        $academic = User::factory()->create(['staff_category' => 'academic']);
+        $academic = User::factory()->create([
+            'staff_category' => 'academic',
+            'can_manage_proposals' => true,
+        ]);
         $proposal = Proposal::create([
             'title' => 'Missing attachment',
             'timeline' => '2026-12-01 to 2026-12-15',
@@ -82,7 +91,10 @@ class ProposalTimelineTest extends TestCase
     public function test_proposal_end_date_cannot_be_before_start_date(): void
     {
         Storage::fake('public');
-        $academic = User::factory()->create(['staff_category' => 'academic']);
+        $academic = User::factory()->create([
+            'staff_category' => 'academic',
+            'can_manage_proposals' => true,
+        ]);
 
         $this->actingAs($academic)->from(route('proposals.create'))
             ->post(route('proposals.store'), [

@@ -11,6 +11,7 @@
   <meta name="msapplication-TileImage" content="/ms-icon-144x144.png">
   <meta name="theme-color" content="#fff">
   <meta name="apple-mobile-web-app-status-bar-style" content="#ffffff">
+  <link rel="icon" type="image/png" href="{{ asset('images/2.png') }}?v=aru">
 
   <title>ARDHI | Home</title>
   <style media="screen">
@@ -128,7 +129,630 @@
     white-space: nowrap;
 }
 
+.top_menu .mail-nav-link {
+    position: relative;
+    justify-content: center;
+    min-width: 44px;
+}
+
+.mail-nav-link svg {
+    width: 21px;
+    height: 21px;
+}
+
+.mail-nav-count {
+    position: absolute;
+    top: 1px;
+    right: 1px;
+    min-width: 17px;
+    padding: 0.1rem 0.28rem;
+    border: 1px solid #80902d;
+    border-radius: 999px;
+    background: #d93025;
+    color: #fff;
+    font-size: 0.65rem;
+    font-weight: 700;
+    line-height: 1.15;
+    text-align: center;
+}
+
+.mail-page {
+    max-width: 1280px;
+    padding-bottom: 2rem;
+}
+
+.mail-workspace {
+    display: grid;
+    grid-template-columns: 220px minmax(0, 1fr);
+    gap: 1.5rem;
+    align-items: start;
+}
+
+.mail-sidebar {
+    position: sticky;
+    top: 1rem;
+    padding: 1rem 0.75rem;
+    border: 1px solid #e2e6d9;
+    border-radius: 0.7rem;
+    background: #fff;
+    box-shadow: 0 0.4rem 1.1rem rgba(37, 48, 10, 0.05);
+}
+
+.mail-folder-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.65rem 0.8rem;
+    border-radius: 0.45rem;
+    color: #3a4219;
+    font-weight: 500;
+    text-decoration: none;
+}
+
+.mail-folder-link:hover,
+.mail-folder-link.active {
+    background: #f0f3e5;
+    color: #35410c;
+}
+
+.mail-folder-link.active {
+    font-weight: 700;
+}
+
+.mail-main {
+    min-width: 0;
+}
+
+.mail-page-heading {
+    color: #27310b;
+}
+
+.mail-toolbar {
+    border-bottom: 2px solid #e8ebdf;
+}
+
+.mail-tabs .nav-link {
+    color: #59622e;
+    font-weight: 600;
+}
+
+.mail-tabs .nav-link.active {
+    color: #35410c;
+    border-color: #e4e8d8 #e4e8d8 #fff;
+}
+
+.mail-list {
+    overflow: hidden;
+    border: 1px solid #e2e6d9;
+    border-radius: 0.7rem;
+    box-shadow: 0 0.4rem 1.1rem rgba(37, 48, 10, 0.06);
+    background: #fff;
+}
+
+.mail-list-item {
+    display: grid;
+    gap: 0.3rem;
+    padding: 0.95rem 1.15rem;
+    border: 0;
+    border-bottom: 1px solid #edf0e8;
+    color: #293014;
+}
+
+.mail-list-item:last-child {
+    border-bottom: 0;
+}
+
+.mail-list-item:hover {
+    background: #f7f9f2;
+}
+
+.mail-list-item-unread {
+    background: #f4f7e9;
+    box-shadow: inset 4px 0 #80902d;
+}
+
+.mail-subject-link {
+    color: #303b0d;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.mail-subject-link:hover {
+    color: #64751c;
+    text-decoration: underline;
+}
+
+.mail-list-meta,
+.mail-list-footer {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.35rem 0.8rem;
+    color: #68704b;
+    font-size: 0.84rem;
+}
+
+.mail-list-meta time {
+    white-space: nowrap;
+}
+
+.mail-message-preview {
+    display: block;
+    overflow: hidden;
+    color: #717761;
+    text-decoration: none;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.mail-empty-state {
+    display: grid;
+    min-height: 260px;
+    place-content: center;
+    gap: 0.4rem;
+    padding: 2rem;
+    text-align: center;
+}
+
+.mail-empty-icon {
+    color: #a4ae7f;
+    font-size: 2.5rem;
+}
+
+.mail-label {
+    padding: 0.15rem 0.45rem;
+    border-radius: 0.25rem;
+    background: #f1f2eb;
+    color: #68704b;
+    font-size: 0.72rem;
+    font-weight: 700;
+}
+
+.mail-attachment-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    max-width: 100%;
+    padding: 0.35rem 0.6rem;
+    border: 1px solid #e2e6d9;
+    border-radius: 0.4rem;
+    background: #fff;
+    color: #39420f;
+    overflow-wrap: anywhere;
+    flex-wrap: wrap;
+    font-size: 0.85rem;
+}
+
+.mail-attachment-chip a {
+    color: #52671a;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.mail-message-card {
+    overflow: hidden;
+    border: 1px solid #e4e8dc;
+    border-radius: 0.65rem;
+}
+
+.mail-message-card-outgoing {
+    border-left: 4px solid #80902d;
+}
+
+.mail-message-card-incoming {
+    border-left: 4px solid #bcc4a3;
+}
+
+.mail-message-card .card-header {
+    background: #f7f8f3;
+}
+
+.mail-recipient-details {
+    display: grid;
+    gap: 0.15rem;
+    margin-top: 0.25rem;
+    color: #68704b;
+    font-size: 0.8rem;
+    font-weight: 400;
+}
+
+.mail-message-body {
+    overflow-wrap: anywhere;
+    white-space: pre-wrap;
+}
+
+.mail-message-body > :last-child {
+    margin-bottom: 0;
+}
+
+.mail-copy-fields {
+    padding: 0.75rem 0.9rem;
+    border: 1px solid #e2e6d9;
+    border-radius: 0.5rem;
+    background: #fbfcf8;
+}
+
+.mail-copy-fields summary {
+    color: #52671a;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.mail-preview-frame {
+    display: block;
+    width: 100%;
+    height: min(70vh, 650px);
+    border: 1px solid #e2e6d9;
+    border-radius: 0.4rem;
+    background: #f7f8f3;
+}
+
+.mail-preview-image {
+    display: block;
+    max-width: 100%;
+    max-height: 650px;
+    margin-top: 0.75rem;
+    border: 1px solid #e2e6d9;
+    border-radius: 0.4rem;
+    object-fit: contain;
+}
+
+.mail-compose-card {
+    gap: 0;
+    padding: clamp(0.85rem, 1.6vw, 1.25rem);
+    border: 1px solid #e2e6d9;
+    border-radius: 0.8rem;
+    background: linear-gradient(180deg, #fff 0%, #fdfefb 100%);
+    box-shadow: 0 0.5rem 1.4rem rgba(37, 48, 10, 0.08);
+}
+
+.mail-compose-title-icon {
+    float: left;
+    display: grid;
+    width: 42px;
+    height: 42px;
+    margin: 0.1rem 0.85rem 0 0;
+    place-items: center;
+    border-radius: 0.65rem;
+    background: #eef2e2;
+    color: #64751c;
+}
+
+.mail-compose-title-icon svg {
+    width: 23px;
+    height: 23px;
+}
+
+.mail-compose-main .mail-compose-field {
+    margin-bottom: 0.75rem;
+}
+
+.mail-compose-main .mail-compose-field > .form-label,
+.mail-recipient-picker > .form-label,
+.mail-recipient-picker .form-label {
+    margin-bottom: 0.3rem;
+    color: #39421b;
+    font-weight: 650;
+}
+
+.mail-compose-main .mail-compose-card .form-control,
+.mail-compose-main .mail-compose-card .form-select {
+    min-height: 38px;
+    border-color: #dce2d2;
+    border-radius: 0.48rem;
+    background-color: #fff;
+}
+
+.mail-compose-main .mail-compose-card .form-control:focus,
+.mail-compose-main .mail-compose-card .form-select:focus {
+    border-color: #9da96f;
+    box-shadow: 0 0 0 0.2rem rgba(128, 144, 45, 0.14);
+}
+
+.mail-recipient-picker {
+    padding: 0.6rem 0.7rem;
+    border: 1px solid #e3e8da;
+    border-radius: 0.58rem;
+    background: #fff;
+}
+
+.mail-recipient-count {
+    color: #70775a;
+    font-size: 0.78rem;
+}
+
+.mail-recipient-search-wrap {
+    position: relative;
+}
+
+.mail-recipient-search {
+    min-height: 35px !important;
+    font-size: 0.84rem;
+}
+
+.mail-recipient-options {
+    position: absolute;
+    z-index: 20;
+    top: calc(100% + 0.25rem);
+    right: 0;
+    left: 0;
+    max-height: 190px;
+    overflow-y: auto;
+    border: 1px solid #edf0e8;
+    border-radius: 0.45rem;
+    background: #fcfdf9;
+    box-shadow: 0 0.5rem 1rem rgba(37, 48, 10, 0.14);
+}
+
+.mail-recipient-options[hidden],
+.mail-recipient-option[hidden],
+.mail-recipient-no-results[hidden] {
+    display: none !important;
+}
+
+.mail-recipient-selected {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+    margin-bottom: 0.3rem;
+}
+
+.mail-recipient-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    max-width: 100%;
+    padding: 0.12rem 0.4rem 0.12rem 0.55rem;
+    border: 1px solid #dfe5d2;
+    border-radius: 1rem;
+    background: #f3f6eb;
+    color: #435316;
+    font-size: 0.75rem;
+}
+
+.mail-recipient-chip > span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.mail-recipient-chip button {
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: #596a19;
+    font-size: 1rem;
+    line-height: 1;
+}
+
+.mail-recipient-option {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    min-width: 0;
+    padding: 0.4rem 0.6rem;
+    cursor: pointer;
+    transition: background-color 120ms ease;
+}
+
+.mail-recipient-option + .mail-recipient-option {
+    border-top: 1px solid #f0f2ec;
+}
+
+.mail-recipient-option:hover {
+    background: #f3f6eb;
+}
+
+.mail-recipient-option .form-check-input {
+    position: static !important;
+    flex: 0 0 auto;
+    margin: 0;
+}
+
+.mail-recipient-identity {
+    display: grid;
+    min-width: 0;
+    line-height: 1.25;
+}
+
+.mail-recipient-identity strong,
+.mail-recipient-identity small {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.mail-recipient-identity strong {
+    color: #31391b;
+    font-size: 0.84rem;
+}
+
+.mail-recipient-identity small {
+    color: #7a806b;
+    font-size: 0.74rem;
+}
+
+.mail-recipient-option-disabled {
+    opacity: 0.42;
+    cursor: not-allowed;
+}
+
+.mail-recipient-no-results {
+    margin: 0;
+    padding: 0.75rem;
+    color: #777e64;
+    font-size: 0.82rem;
+    text-align: center;
+}
+
+.mail-copy-fields {
+    margin-bottom: 0.7rem;
+}
+
+.mail-copy-fields summary {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.8rem;
+    padding: 0.55rem 0.7rem;
+}
+
+.mail-copy-fields summary small {
+    color: #858b75;
+    font-weight: 400;
+}
+
+.mail-copy-fields[open] {
+    padding-bottom: 0.85rem;
+}
+
+.mail-copy-fields[open] > summary {
+    border-bottom: 1px solid #e7ebdf;
+}
+
+.mail-compose-card .ck.ck-editor {
+    width: 100%;
+}
+
+.mail-editor-validation-error {
+    display: block;
+}
+
+.mail-editor-validation-error[hidden] {
+    display: none !important;
+}
+
+.mail-compose-card .ck.ck-toolbar {
+    border-color: #dce2d2;
+    border-radius: 0.48rem 0.48rem 0 0;
+    background: #f7f9f3;
+}
+
+.mail-compose-card .ck.ck-editor__main > .ck-editor__editable {
+    min-height: 155px;
+    border-color: #dce2d2;
+    border-radius: 0 0 0.48rem 0.48rem;
+    box-shadow: none;
+}
+
+.mail-attachment-dropzone {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    padding: 0.55rem 0.7rem;
+    border: 1px dashed #c9d1b3;
+    border-radius: 0.55rem;
+    background: #fbfcf8;
+    color: #5e6646;
+    cursor: pointer;
+    transition: border-color 140ms ease, background-color 140ms ease;
+}
+
+.mail-attachment-dropzone:hover {
+    border-color: #80902d;
+    background: #f5f7ed;
+}
+
+.mail-attachment-icon {
+    display: grid;
+    width: 32px;
+    height: 32px;
+    flex: 0 0 auto;
+    place-items: center;
+    border-radius: 0.5rem;
+    background: #edf1e2;
+    color: #64751c;
+}
+
+.mail-attachment-icon svg {
+    width: 22px;
+    height: 22px;
+}
+
+.mail-attachment-dropzone strong {
+    color: #52671a;
+}
+
+.mail-attachment-dropzone small {
+    display: block;
+    margin-top: 0.16rem;
+    color: #858b75;
+}
+
+.mail-attachment-dropzone input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    clip-path: inset(50%);
+}
+
+.mail-attachment-dropzone:focus-within {
+    outline: 2px solid #80902d;
+    outline-offset: 2px;
+}
+
+.mail-attachment-filename {
+    display: block;
+    margin-top: 0.5rem;
+    color: #52671a;
+    font-size: 0.84rem;
+    overflow-wrap: anywhere;
+}
+
+.mail-compose-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    padding-top: 0.65rem;
+    border-top: 1px solid #edf0e8;
+}
+
+.mail-send-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding-inline: 1rem;
+}
+
+.mail-send-button svg {
+    width: 17px;
+    height: 17px;
+}
+
 @media (max-width: 575.98px) {
+    .mail-workspace {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 1rem;
+    }
+
+    .mail-sidebar {
+        position: static;
+        padding: 0.75rem;
+    }
+
+    .mail-sidebar .nav {
+        flex-direction: row !important;
+        gap: 0.3rem;
+    }
+
+    .mail-folder-link {
+        flex: 1;
+    }
+
+    .mail-copy-fields summary {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 0.15rem;
+    }
+
+    .mail-compose-card .ck.ck-toolbar {
+        overflow-x: auto;
+    }
+
     .attendee-option {
         grid-template-columns: minmax(0, 1fr);
         gap: 0.35rem;
@@ -338,6 +962,7 @@
     }
 
   </style>
+  @stack('styles')
 </head>
 
 <body>
@@ -360,11 +985,29 @@
                     <li class='nav-item'>
                         <a class='nav-link' href='{{ route('counter.report') }}'>Visitors</a>
                     </li>
+                    @php($unreadMailCount = Auth::user()->mailRecipientCopies()->whereNull('read_at')->count())
+                    <li class='nav-item'>
+                        <a class='nav-link mail-nav-link' href='{{ route('staff-mail.inbox') }}'
+                           aria-label="Mail{{ $unreadMailCount ? ', '.$unreadMailCount.' unread' : '' }}"
+                           title="Mail{{ $unreadMailCount ? ' ('.$unreadMailCount.' unread)' : '' }}">
+                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                <path d="M3.5 6.5h17v12h-17z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+                                <path d="m4 7 8 6 8-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            @if ($unreadMailCount)
+                                <span class="mail-nav-count">{{ $unreadMailCount > 99 ? '99+' : $unreadMailCount }}</span>
+                            @endif
+                        </a>
+                    </li>
                     <li class="nav-item dropdown publication-dropdown navigation-dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="publicationDropdown" role="button"
                            data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">Publication</a>
                         <ul class="dropdown-menu" aria-labelledby="publicationDropdown">
-                            @if(Auth::user()->isAdmin())
+                            <li><a class="dropdown-item" href="{{ route('calendar.index') }}">Library Calendar</a></li>
+                            <li><a class="dropdown-item" href="{{ route('proposal') }}">Proposal Management</a></li>
+                            @if(Auth::user()->isAdmin()
+                                || Auth::user()->staff_category === 'administrative'
+                                || Auth::user()->canManageMinutesFor('administrative'))
                                 <li class="publication-submenu">
                                     <button class="dropdown-item dropdown-toggle" type="button"
                                             data-publication-submenu="administrationSubmenu" aria-expanded="false">
@@ -376,30 +1019,35 @@
                                     </ul>
                                 </li>
                             @endif
-                            @if(Auth::user()->isAcademicStaff() || Auth::user()->isAdmin())
+                            @if(Auth::user()->staff_category === 'academic'
+                                || Auth::user()->isAdmin()
+                                || Auth::user()->canManageMinutesFor('academic'))
                                 <li class="publication-submenu">
                                     <button class="dropdown-item dropdown-toggle" type="button"
                                             data-publication-submenu="academicsSubmenu" aria-expanded="false">
                                         Academics
                                     </button>
                                     <ul class="dropdown-menu" id="academicsSubmenu" hidden>
-                                        <li><a class="dropdown-item" href="{{ route('proposal') }}">Proposal Management</a></li>
-                                        <li><a class="dropdown-item" href="{{ route('academics.meetings.index') }}">Minutes Management</a></li>
+                                        <li><a class="dropdown-item" href="{{ route('academics.meetings.index') }}">Meeting Minutes Management</a></li>
                                     </ul>
                                 </li>
                             @endif
                         </ul>
                     </li>
-                    <li class="nav-item dropdown settings-dropdown navigation-dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="settingsDropdown" role="button"
-                           data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">Settings</a>
-                        <ul class="dropdown-menu" aria-labelledby="settingsDropdown">
-                            <li><a class="dropdown-item" href="{{ route('chatbot.training.index') }}">Train Chatbot</a></li>
-                            @if(Auth::user()->isAdmin())
-                                <li><a class="dropdown-item" href="{{ route('admin.users.index') }}">Manage Users</a></li>
-                            @endif
-                        </ul>
-                    </li>
+                    @if(Auth::user()->canAccessSettingsNavigation())
+                        <li class="nav-item dropdown settings-dropdown navigation-dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="settingsDropdown" role="button"
+                               data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">Settings</a>
+                            <ul class="dropdown-menu" aria-labelledby="settingsDropdown">
+                                @if(Auth::user()->canTrainChatbot())
+                                    <li><a class="dropdown-item" href="{{ route('chatbot.training.index') }}">Train Chatbot</a></li>
+                                @endif
+                                @if(Auth::user()->isAdmin())
+                                    <li><a class="dropdown-item" href="{{ route('admin.users.index') }}">Manage Users</a></li>
+                                @endif
+                            </ul>
+                        </li>
+                    @endif
                     <li class="nav-item dropdown user-dropdown navigation-dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
                            data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">

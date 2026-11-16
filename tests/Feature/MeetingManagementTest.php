@@ -92,7 +92,10 @@ class MeetingManagementTest extends TestCase
             ->assertOk()
             ->assertHeader('content-type', 'audio/wav');
 
-        $academic = User::factory()->create(['staff_category' => 'academic']);
+        $academic = User::factory()->create([
+            'staff_category' => 'academic',
+            'can_manage_academic_minutes' => true,
+        ]);
         $this->actingAs($academic)
             ->get(route('academics.meetings.audio', $meeting))
             ->assertNotFound();
@@ -121,7 +124,10 @@ class MeetingManagementTest extends TestCase
     public function test_academic_user_can_attach_and_play_meeting_audio(): void
     {
         Storage::fake('local');
-        $academic = User::factory()->create(['staff_category' => 'academic']);
+        $academic = User::factory()->create([
+            'staff_category' => 'academic',
+            'can_manage_academic_minutes' => true,
+        ]);
 
         $this->actingAs($academic)
             ->post(route('academics.meetings.store'), [
@@ -245,9 +251,13 @@ class MeetingManagementTest extends TestCase
     {
         Storage::fake('local');
         $academic = User::factory()->create(['staff_category' => 'academic']);
+        $academicManager = User::factory()->create([
+            'staff_category' => 'academic',
+            'can_manage_academic_minutes' => true,
+        ]);
         $adminMeeting = $this->createMeeting(['title' => 'Administration minutes']);
 
-        $this->actingAs($academic)
+        $this->actingAs($academicManager)
             ->post(route('academics.meetings.store'), [
                 'title' => 'Academic council',
                 'meeting_at' => '2026-12-03T09:00',
@@ -260,19 +270,36 @@ class MeetingManagementTest extends TestCase
         $academicMeeting = Meeting::where('title', 'Academic council')->firstOrFail();
         $this->assertSame('academic', $academicMeeting->section);
 
-        $this->get(route('academics.meetings.index'))
+        $this->actingAs($academic)
+            ->get(route('academics.meetings.index'))
+            ->assertOk()
+            ->assertSee('Academic council')
+            ->assertDontSee('Record academic meeting')
+            ->assertDontSee('Edit');
+
+        $this->actingAs($academic)
+            ->post(route('academics.meetings.store'), [
+                'title' => 'Reader cannot record',
+                'meeting_at' => '2026-12-03T09:00',
+                'venue' => 'Senate Room',
+                'minutes' => 'Should be denied.',
+            ])
+            ->assertForbidden();
+
+        $this->actingAs($academicManager)
+            ->get(route('academics.meetings.index'))
             ->assertOk()
             ->assertSee('Academic council')
             ->assertDontSee('Administration minutes');
 
-        $this->get(route('academics.meetings.edit', $adminMeeting))->assertNotFound();
-        $this->put(route('academics.meetings.update', $adminMeeting), [
+        $this->actingAs($academicManager)->get(route('academics.meetings.edit', $adminMeeting))->assertNotFound();
+        $this->actingAs($academicManager)->put(route('academics.meetings.update', $adminMeeting), [
             'title' => 'Unauthorized update',
             'meeting_at' => '2026-12-03T09:00',
             'venue' => 'Senate Room',
             'minutes' => 'Should not update.',
         ])->assertNotFound();
-        $this->delete(route('academics.meetings.destroy', $adminMeeting))->assertNotFound();
+        $this->actingAs($academicManager)->delete(route('academics.meetings.destroy', $adminMeeting))->assertNotFound();
 
         $this->actingAs(User::factory()->create(['is_admin' => true]))
             ->get(route('admin.meetings.index'))
@@ -293,7 +320,10 @@ class MeetingManagementTest extends TestCase
             'email' => 'administrative.attendee@example.test',
             'staff_category' => 'administrative',
         ]);
-        $recorder = User::factory()->create(['staff_category' => 'academic']);
+        $recorder = User::factory()->create([
+            'staff_category' => 'academic',
+            'can_manage_academic_minutes' => true,
+        ]);
 
         $this->actingAs($recorder)
             ->get(route('academics.meetings.create'))
@@ -329,7 +359,10 @@ class MeetingManagementTest extends TestCase
     public function test_academic_meeting_rejects_administrative_staff_as_attendee(): void
     {
         $administrative = User::factory()->create(['staff_category' => 'administrative']);
-        $academic = User::factory()->create(['staff_category' => 'academic']);
+        $academic = User::factory()->create([
+            'staff_category' => 'academic',
+            'can_manage_academic_minutes' => true,
+        ]);
 
         $this->actingAs($academic)
             ->from(route('academics.meetings.create'))
@@ -390,6 +423,48 @@ class MeetingManagementTest extends TestCase
             ->assertDontSee('Administration in range')
             ->assertSee('name="from"', false)
             ->assertSee('name="to"', false);
+    }
+
+    public function test_administrative_staff_can_read_minutes_but_only_assigned_managers_can_write(): void
+    {
+        $reader = User::factory()->create(['staff_category' => 'administrative']);
+        $manager = User::factory()->create([
+            'staff_category' => 'administrative',
+            'can_manage_administrative_minutes' => true,
+        ]);
+        $meeting = $this->createMeeting();
+
+        $this->actingAs($reader)
+            ->get(route('admin.meetings.index'))
+            ->assertOk()
+            ->assertSee($meeting->title)
+            ->assertDontSee('Record meeting')
+            ->assertDontSee('Edit');
+        $this->actingAs($reader)->get(route('admin.meetings.create'))->assertForbidden();
+
+        $this->actingAs($manager)
+            ->get(route('admin.meetings.create'))
+            ->assertOk();
+        $this->actingAs($manager)
+            ->post(route('admin.meetings.store'), [
+                'title' => 'Administrative council',
+                'meeting_at' => '2026-12-05T10:00',
+                'venue' => 'Board Room',
+                'minutes' => 'Administrative decisions.',
+            ])
+            ->assertRedirect(route('admin.meetings.index'));
+
+        $this->actingAs($reader)
+            ->delete(route('admin.meetings.destroy', $meeting))
+            ->assertForbidden();
+
+        $crossCategoryManager = User::factory()->create([
+            'staff_category' => 'administrative',
+            'can_manage_academic_minutes' => true,
+        ]);
+        $this->actingAs($crossCategoryManager)
+            ->get(route('academics.meetings.create'))
+            ->assertOk();
     }
 
     private function createMeeting(array $overrides = []): Meeting

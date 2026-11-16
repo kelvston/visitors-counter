@@ -30,7 +30,21 @@
                         <td>{{ $user->name }}</td>
                         <td>{{ $user->email }}</td>
                         <td>{{ ucfirst($user->staff_category) }}</td>
-                        <td>{{ $user->isAdmin() ? 'Administrator' : 'User' }}</td>
+                        <td>
+                            @if ($user->isAdmin())
+                                Administrator
+                            @else
+                                @php($permissions = collect([
+                                    $user->can_manage_academic_minutes ? 'Academic minutes' : null,
+                                    $user->can_manage_administrative_minutes ? 'Administrative minutes' : null,
+                                    $user->can_manage_proposals ? 'Proposals' : null,
+                                    $user->can_manage_calendar ? 'Library calendar' : null,
+                                    $user->can_train_chatbot ? 'Train chatbot' : null,
+                                    $user->can_access_settings_navigation ? 'Settings navigation' : null,
+                                ])->filter())
+                                {{ $permissions->isEmpty() ? 'Read only' : $permissions->implode(', ') }}
+                            @endif
+                        </td>
                         <td class="text-nowrap">
                             <a href="{{ route('admin.users.edit', $user) }}" class="btn btn-sm btn-primary">Edit</a>
                             @unless (auth()->user()->is($user))

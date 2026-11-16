@@ -4,7 +4,9 @@
     <div class="container mt-4">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h1 class="h3">Meeting Minutes</h1>
-            <a href="{{ route('admin.meetings.create') }}" class="btn btn-primary">Record meeting</a>
+            @if ($canManage)
+                <a href="{{ route('admin.meetings.create') }}" class="btn btn-primary">Record meeting</a>
+            @endif
         </div>
 
         @if (session('status'))
@@ -64,14 +66,16 @@
                                 <a href="{{ route('admin.meetings.minutes.download', $meeting) }}"
                                    class="btn btn-sm btn-outline-primary">Download PDF</a>
                             @endif
-                            <a href="{{ route('admin.meetings.edit', $meeting) }}"
-                               class="btn btn-sm btn-secondary">Edit</a>
-                            <form action="{{ route('admin.meetings.destroy', $meeting) }}" method="POST" class="d-inline"
-                                  onsubmit="return confirm('Remove this meeting record?');">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="btn btn-sm btn-outline-danger">Remove</button>
-                            </form>
+                            @if ($canManage)
+                                <a href="{{ route('admin.meetings.edit', $meeting) }}"
+                                   class="btn btn-sm btn-secondary">Edit</a>
+                                <form action="{{ route('admin.meetings.destroy', $meeting) }}" method="POST" class="d-inline"
+                                      onsubmit="return confirm('Remove this meeting record?');">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">Remove</button>
+                                </form>
+                            @endif
                         </td>
                     </tr>
                 @empty

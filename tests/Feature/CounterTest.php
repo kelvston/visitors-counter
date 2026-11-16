@@ -34,13 +34,11 @@ class CounterTest extends TestCase
             ->post(route('counter.increment.multiple'), [
                 'maleCountInput' => 2,
                 'femaleCountInput' => 3,
-                'otherCountInput' => 1,
             ])
             ->assertRedirect(route('counter.report'));
 
         $this->assertDatabaseHas('counters', ['user_id' => $user->id, 'gender' => 1, 'counts' => 2]);
         $this->assertDatabaseHas('counters', ['user_id' => $user->id, 'gender' => 2, 'counts' => 3]);
-        $this->assertDatabaseHas('counters', ['user_id' => $user->id, 'gender' => 3, 'counts' => 1]);
     }
 
     public function test_counter_requires_authentication(): void
@@ -61,5 +59,34 @@ class CounterTest extends TestCase
             ->assertSessionHasErrors('gender');
 
         $this->assertSame(0, Counter::count());
+    }
+
+    public function test_other_gender_cannot_be_submitted_for_single_or_multiple_counts(): void
+    {
+        $user = User::factory()->create();
+
+        $this->actingAs($user)
+            ->from(route('counter.report'))
+            ->post(route('counter.increment'), ['gender' => 3])
+            ->assertSessionHasErrors('gender');
+
+        $this->actingAs($user)
+            ->from(route('counter.report'))
+            ->post(route('counter.increment.multiple'), [
+                'maleCountInput' => 1,
+                'otherCountInput' => 1,
+            ])
+            ->assertSessionHasErrors('otherCountInput');
+
+        $this->assertDatabaseCount('counters', 0);
+    }
+
+    public function test_other_gender_cannot_be_decremented(): void
+    {
+        $user = User::factory()->create();
+
+        $this->actingAs($user)
+            ->post(route('counter.decrement'), ['gender' => 'other'])
+            ->assertSessionHasErrors('gender');
     }
 }

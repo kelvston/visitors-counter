@@ -31,11 +31,23 @@ class UserManagementController extends Controller
             'email' => ['required', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
             'staff_category' => ['required', Rule::in(['academic', 'administrative'])],
             'password' => ['nullable', 'confirmed', Password::defaults()],
+            'can_manage_academic_minutes' => ['sometimes', 'boolean'],
+            'can_manage_administrative_minutes' => ['sometimes', 'boolean'],
+            'can_manage_proposals' => ['sometimes', 'boolean'],
+            'can_manage_calendar' => ['sometimes', 'boolean'],
+            'can_train_chatbot' => ['sometimes', 'boolean'],
+            'can_access_settings_navigation' => ['sometimes', 'boolean'],
         ]);
 
         $user->name = $validated['name'];
         $user->email = $validated['email'];
         $user->staff_category = $validated['staff_category'];
+        $user->can_manage_academic_minutes = $request->boolean('can_manage_academic_minutes');
+        $user->can_manage_administrative_minutes = $request->boolean('can_manage_administrative_minutes');
+        $user->can_manage_proposals = $request->boolean('can_manage_proposals');
+        $user->can_manage_calendar = $request->boolean('can_manage_calendar');
+        $user->can_train_chatbot = $request->boolean('can_train_chatbot');
+        $user->can_access_settings_navigation = $request->boolean('can_access_settings_navigation');
 
         if (! empty($validated['password'])) {
             $user->password = $validated['password'];

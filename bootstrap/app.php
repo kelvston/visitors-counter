@@ -13,7 +13,11 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->alias([
             'admin' => \App\Http\Middleware\EnsureUserIsAdmin::class,
+            'chatbot.trainer' => \App\Http\Middleware\EnsureChatbotTrainer::class,
             'academic' => \App\Http\Middleware\EnsureAcademicStaff::class,
+            'meeting.access' => \App\Http\Middleware\EnsureMeetingAccess::class,
+            'proposal.manager' => \App\Http\Middleware\EnsureProposalManager::class,
+            'calendar.manager' => \App\Http\Middleware\EnsureCalendarManager::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
